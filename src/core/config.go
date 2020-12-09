@@ -1,4 +1,4 @@
-package main
+package github.com/triviy/parklakes-viberbot/core
 
 import (
 	"github.com/ilyakaznacheev/cleanenv"
@@ -24,7 +24,7 @@ type apiConfig struct {
 
 // InitalizeAPIConfig initalizes configuration for application
 func InitalizeAPIConfig() error {
-	return cleanenv.ReadConfig("config.yml", &cfg)
+	return cleanenv.ReadConfig("../config.yml", &cfg)
 }
 
 // GetDBConnectionString returns database connection string from configuration

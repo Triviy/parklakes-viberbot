@@ -1,4 +1,4 @@
-package main
+package github.com/triviy/parklakes-viberbot/core
 
 import (
 	"log"
