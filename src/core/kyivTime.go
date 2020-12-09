@@ -1,4 +1,4 @@
-package github.com/triviy/parklakes-viberbot/core
+package core
 
 import (
 	"log"
@@ -28,4 +28,9 @@ func GetKyivTime() time.Time {
 		log.Fatalf("Error while getting location: %v\n", err)
 	}
 	return time.Now().In(loc)
+}
+
+// GetKyivTimeString returns current time string in Kyiv format
+func GetKyivTimeString() string {
+	return GetKyivTime().Format(kyivFormat)
 }

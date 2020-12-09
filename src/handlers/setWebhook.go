@@ -1,4 +1,4 @@
-package github.com/triviy/parklakes-viberbot/handlers
+package handlers
 
 import (
 	"bytes"
@@ -6,6 +6,8 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+
+	"github.com/triviy/parklakes-viberbot/config"
 )
 
 // {
@@ -50,8 +52,8 @@ type setWebhookResponse struct {
 // SetWebhook sends a Webhook url for Viber API
 func SetWebhook() {
 	request := setWebhookRequest{
-		AuthToken: GetViberAPIKey(),
-		URL:       GetViberWebhookURL(),
+		AuthToken: config.GetViberAPIKey(),
+		URL:       config.GetViberWebhookURL(),
 		EventTypes: []string{
 			"delivered",
 			"seen",
@@ -68,7 +70,7 @@ func SetWebhook() {
 	if err != nil {
 		log.Fatalln(err)
 	}
-	apiURL := fmt.Sprintf("%s/pa/set_webhook", GetViberBaseURL())
+	apiURL := fmt.Sprintf("%s/pa/set_webhook", config.GetViberBaseURL())
 	resp, err := http.Post(apiURL, "application/json", bytes.NewBuffer(bytesRepresentation))
 	if err != nil {
 		log.Fatalln(err)

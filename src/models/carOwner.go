@@ -1,4 +1,4 @@
-package github.com/triviy/parklakes-viberbot/models
+package models
 
 import (
 	"regexp"

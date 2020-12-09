@@ -1,10 +1,13 @@
-package github.com/triviy/parklakes-viberbot/stores
+package stores
 
 import (
 	"context"
 	"log"
 	"time"
 
+	"github.com/triviy/parklakes-viberbot/config"
+	"github.com/triviy/parklakes-viberbot/core"
+	"github.com/triviy/parklakes-viberbot/models"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -19,7 +22,7 @@ const (
 )
 
 // GetCardOwner returns card owners data from database by id
-func GetCardOwner(id string) *CarOwner {
+func GetCardOwner(id string) *models.CarOwner {
 	c := connect(time.Minute)
 	ctx := context.Background()
 	defer c.Disconnect(ctx)
@@ -27,7 +30,7 @@ func GetCardOwner(id string) *CarOwner {
 	col := c.Database(database).Collection(coCollection)
 	f := col.FindOne(ctx, bson.M{"_id": id})
 
-	var co CarOwner
+	var co models.CarOwner
 	if err := f.Err(); err != nil {
 		if err == mongo.ErrNoDocuments {
 			log.Printf("Could not get car owner %s: %v\n", id, err)
@@ -41,18 +44,18 @@ func GetCardOwner(id string) *CarOwner {
 }
 
 // MigrateCardOwners migrates car owners to database
-func MigrateCardOwners(cos map[string]CarOwner) {
+func MigrateCardOwners(cos map[string]models.CarOwner) {
 	c := connect(time.Minute * 10)
 	ctx := context.Background()
 	defer c.Disconnect(ctx)
 
 	prop := getLastMigrationProp(ctx, c)
-	lastMigrationTime := ToKyivTime(prop.Value)
+	lastMigrationTime := core.ToKyivTime(prop.Value)
 	opts := options.Replace().SetUpsert(true)
 	coCol := c.Database(database).Collection(coCollection)
 
 	for _, co := range cos {
-		if ToKyivTime(co.Created).Before(lastMigrationTime) {
+		if core.ToKyivTime(co.Created).Before(lastMigrationTime) {
 			continue
 		}
 		_, err := coCol.ReplaceOne(ctx, bson.M{"_id": co.ID}, co, opts)
@@ -64,9 +67,9 @@ func MigrateCardOwners(cos map[string]CarOwner) {
 	setLastMigrationProp(ctx, c)
 }
 
-func getLastMigrationProp(ctx context.Context, c *mongo.Client) *CarOwnerProp {
+func getLastMigrationProp(ctx context.Context, c *mongo.Client) *models.CarOwnerProp {
 	propsCol := c.Database(database).Collection(propsCollection)
-	prop := CarOwnerProp{
+	prop := models.CarOwnerProp{
 		ID: lastMigrationTimeProp,
 	}
 	f := propsCol.FindOne(ctx, bson.M{"_id": prop.ID})
@@ -81,9 +84,9 @@ func getLastMigrationProp(ctx context.Context, c *mongo.Client) *CarOwnerProp {
 
 func setLastMigrationProp(ctx context.Context, c *mongo.Client) {
 	propsCol := c.Database(database).Collection(propsCollection)
-	prop := CarOwnerProp{
+	prop := models.CarOwnerProp{
 		ID:    lastMigrationTimeProp,
-		Value: GetKyivTime().Format(kyivFormat),
+		Value: core.GetKyivTimeString(),
 	}
 	opts := options.Replace().SetUpsert(true)
 	_, err := propsCol.ReplaceOne(ctx, bson.M{"_id": prop.ID}, prop, opts)
@@ -94,7 +97,7 @@ func setLastMigrationProp(ctx context.Context, c *mongo.Client) {
 }
 
 func connect(timeout time.Duration) *mongo.Client {
-	mongoDBConnectionString := GetDBConnectionString()
+	mongoDBConnectionString := config.GetDBConnectionString()
 	ctx, cancel := context.WithTimeout(context.Background(), timeout)
 	defer cancel()
 

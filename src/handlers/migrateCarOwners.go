@@ -1,9 +1,14 @@
-package github.com/triviy/parklakes-viberbot/handlers
+package handlers
+
+import (
+	"github.com/triviy/parklakes-viberbot/config"
+	"github.com/triviy/parklakes-viberbot/stores"
+)
 
 // MigrateCarOwners runs migration from Google SpreadSheet to database
 func MigrateCarOwners() {
-	spreadsheetID := GetSheetsAPISpreadsheetID()
-	carOwners := GetCarOwners(spreadsheetID)
-	MigrateCardOwners(carOwners)
-	GetCardOwner("CB4498CC")
+	spreadsheetID := config.GetSheetsAPISpreadsheetID()
+	carOwners := stores.GetCarOwners(spreadsheetID)
+	stores.MigrateCardOwners(carOwners)
+	stores.GetCardOwner("CB4498CC")
 }

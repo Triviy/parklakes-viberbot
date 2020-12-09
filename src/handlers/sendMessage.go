@@ -1,4 +1,4 @@
-package github.com/triviy/parklakes-viberbot/handlers
+package handlers
 
 import (
 	"bytes"
@@ -6,6 +6,8 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+
+	"github.com/triviy/parklakes-viberbot/config"
 )
 
 const (
@@ -44,7 +46,7 @@ type sendMessageResponse struct {
 // SendMessage sends Viber user a message
 func SendMessage(receiver string, message string) {
 	request := sendMessageRequest{
-		AuthToken: GetViberAPIKey(),
+		AuthToken: config.GetViberAPIKey(),
 		Receiver:  receiver,
 		Type:      messageType,
 		Text:      message,
@@ -55,7 +57,7 @@ func SendMessage(receiver string, message string) {
 		log.Fatalln(err)
 	}
 
-	apiURL := fmt.Sprintf("%s/pa/send_message", GetViberBaseURL())
+	apiURL := fmt.Sprintf("%s/pa/send_message", config.GetViberBaseURL())
 	resp, err := http.Post(apiURL, "application/json", bytes.NewBuffer(bytesRepresentation))
 	if err != nil {
 		log.Fatalln(err)

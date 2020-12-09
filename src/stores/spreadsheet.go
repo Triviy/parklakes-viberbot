@@ -1,4 +1,4 @@
-package github.com/triviy/parklakes-viberbot/stores
+package stores
 
 import (
 	"encoding/json"
@@ -7,6 +7,8 @@ import (
 	"net/http"
 	"os"
 
+	"github.com/triviy/parklakes-viberbot/config"
+	"github.com/triviy/parklakes-viberbot/models"
 	"golang.org/x/net/context"
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/google"
@@ -14,7 +16,7 @@ import (
 )
 
 // GetCarOwners gets car owners data from Google SpreadSheet
-func GetCarOwners(spreadsheetID string) map[string]CarOwner {
+func GetCarOwners(spreadsheetID string) map[string]models.CarOwner {
 	srv := getSpreadsheetService()
 	readRange := "A2:E"
 	resp, err := srv.Spreadsheets.Values.Get(spreadsheetID, readRange).Do()
@@ -24,9 +26,9 @@ func GetCarOwners(spreadsheetID string) map[string]CarOwner {
 
 	log.Printf("Got %v records:\n", len(resp.Values))
 
-	carOwners := make(map[string]CarOwner)
+	carOwners := make(map[string]models.CarOwner)
 	for _, row := range resp.Values {
-		carOwner := CreateCarOwnerFromRecord(row)
+		carOwner := models.CreateCarOwnerFromRecord(row)
 		if carOwner != nil {
 			carOwners[carOwner.ID] = *carOwner
 		}
@@ -36,7 +38,7 @@ func GetCarOwners(spreadsheetID string) map[string]CarOwner {
 }
 
 func getSpreadsheetService() *sheets.Service {
-	b := []byte(GetSheetsAPICredentialsJSON())
+	b := []byte(config.GetSheetsAPICredentialsJSON())
 	config, err := google.ConfigFromJSON(b, "https://www.googleapis.com/auth/spreadsheets.readonly")
 	if err != nil {
 		log.Fatalf("Unable to parse client secret file to config: %v", err)
@@ -51,14 +53,14 @@ func getSpreadsheetService() *sheets.Service {
 }
 
 // Retrieve a token, saves the token, then returns the generated client.
-func getClient(config *oauth2.Config) *http.Client {
+func getClient(cfg *oauth2.Config) *http.Client {
 	token := &oauth2.Token{}
-	err := json.Unmarshal([]byte(GetSheetsAPITokenJSON()), token)
+	err := json.Unmarshal([]byte(config.GetSheetsAPITokenJSON()), token)
 	if err != nil {
-		token = getTokenFromWeb(config)
+		token = getTokenFromWeb(cfg)
 		saveToken("token.json", token)
 	}
-	return config.Client(context.Background(), token)
+	return cfg.Client(context.Background(), token)
 }
 
 // Request a token from the web, then returns the retrieved token.

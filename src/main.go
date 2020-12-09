@@ -2,17 +2,20 @@ package main
 
 import (
 	"log"
+
+	"github.com/triviy/parklakes-viberbot/config"
+	"github.com/triviy/parklakes-viberbot/handlers"
 )
 
 func main() {
-	err := InitalizeAPIConfig()
+	err := config.InitalizeAPIConfig()
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	//MigrateCarOwners()
 	//SetWebhook()
-	SendMessage("asdasd", "asdasd")
+	handlers.SendMessage("asdasd", "asdasd")
 
 	// e := echo.New()
 	// e.POST("/api/v1/car-owners/migrate", func(c echo.Context) error {
