@@ -1,6 +1,8 @@
 package config
 
 import (
+	"os"
+
 	"github.com/ilyakaznacheev/cleanenv"
 )
 
@@ -8,23 +10,32 @@ var cfg apiConfig
 
 type apiConfig struct {
 	Database struct {
-		ConnectionString string `yaml:"connectionString" envconfig:"DB_CONNECTION_STRING"`
+		ConnectionString string `yaml:"connectionString" env:"DB_CONNECTION_STRING"`
 	} `yaml:"database"`
 	Viber struct {
-		APIKey     string `yaml:"apiKey" envconfig:"VIBER_API_KEY"`
-		WebhookURL string `yaml:"webhookURL" envconfig:"VIBER_WEBHOOK_URL"`
-		BaseURL    string `yaml:"baseURL" envconfig:"VIBER_BASE_URL"`
+		APIKey     string `yaml:"apiKey" env:"VIBER_API_KEY"`
+		WebhookURL string `yaml:"webhookURL" env:"VIBER_WEBHOOK_URL"`
+		BaseURL    string `yaml:"baseURL" env:"VIBER_BASE_URL"`
 	} `yaml:"viber"`
 	SheetsAPI struct {
-		SpreadsheetID   string `yaml:"spreadsheetID" envconfig:"SHEETS_SPREADSHEET_ID"`
-		CredentialsJSON string `yaml:"credentialsJSON" envconfig:"SHEETS_API_CREDENTIALS_JSON"`
-		TokenJSON       string `yaml:"tokenJSON" envconfig:"SHEETS_API_TOKEN_JSON"`
+		SpreadsheetID   string `yaml:"spreadsheetID" env:"SHEETS_SPREADSHEET_ID"`
+		CredentialsJSON string `yaml:"credentialsJSON" env:"SHEETS_API_CREDENTIALS_JSON"`
+		TokenJSON       string `yaml:"tokenJSON" env:"SHEETS_API_TOKEN_JSON"`
 	} `yaml:"sheetsAPI"`
+}
+
+func fileExists(path string) bool {
+	_, err := os.Stat(path)
+	return !os.IsNotExist(err)
 }
 
 // InitalizeAPIConfig initalizes configuration for application
 func InitalizeAPIConfig() error {
-	return cleanenv.ReadConfig("config.yml", &cfg)
+	cfgFile := "config.yml"
+	if fileExists(cfgFile) {
+		return cleanenv.ReadConfig("config.yml", &cfg)
+	}
+	return cleanenv.ReadEnv(&cfg)
 }
 
 // GetDBConnectionString returns database connection string from configuration

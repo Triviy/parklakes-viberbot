@@ -1,0 +1,5 @@
+# Local config
+config.yml
+
+# Local docker launch
+docker-compose.yml
