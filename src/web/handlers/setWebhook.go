@@ -7,6 +7,7 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/labstack/echo"
 	"github.com/triviy/parklakes-viberbot/config"
 )
 
@@ -50,7 +51,7 @@ type setWebhookResponse struct {
 }
 
 // SetWebhook sends a Webhook url for Viber API
-func SetWebhook() {
+func SetWebhook(c echo.Context) error {
 	request := setWebhookRequest{
 		AuthToken: config.GetViberAPIKey(),
 		URL:       config.GetViberWebhookURL(),

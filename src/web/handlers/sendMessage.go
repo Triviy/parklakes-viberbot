@@ -7,6 +7,7 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/labstack/echo"
 	"github.com/triviy/parklakes-viberbot/config"
 )
 
@@ -44,7 +45,8 @@ type sendMessageResponse struct {
 }
 
 // SendMessage sends Viber user a message
-func SendMessage(receiver string, message string) {
+func SendMessage(c echo.Context) error {
+	var receiver, message string
 	request := sendMessageRequest{
 		AuthToken: config.GetViberAPIKey(),
 		Receiver:  receiver,

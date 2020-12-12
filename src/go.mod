@@ -7,6 +7,7 @@ require (
 	github.com/ilyakaznacheev/cleanenv v1.2.5
 	github.com/labstack/echo v3.3.10+incompatible
 	github.com/labstack/gommon v0.3.0 // indirect
+	github.com/pkg/errors v0.9.1
 	go.mongodb.org/mongo-driver v1.4.4
 	golang.org/x/crypto v0.0.0-20200820211705-5c72a883971a // indirect
 	golang.org/x/net v0.0.0-20201209123823-ac852fbbde11
