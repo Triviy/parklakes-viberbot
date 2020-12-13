@@ -4,6 +4,7 @@ import (
 	"os"
 
 	"github.com/ilyakaznacheev/cleanenv"
+	"github.com/pkg/errors"
 )
 
 type apiConfig struct {
@@ -33,6 +34,9 @@ func NewAPIConfig() (apiCfg *APIConfig, err error) {
 		err = cleanenv.ReadConfig("config.yml", &apiCfg.cfg)
 	}
 	err = cleanenv.ReadEnv(&apiCfg.cfg)
+	if err != nil {
+		err = errors.Wrap(err, "creating config failed")
+	}
 	return
 }
 
