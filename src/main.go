@@ -10,6 +10,7 @@ import (
 
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
+	"github.com/triviy/parklakes-viberbot/web"
 	"github.com/triviy/parklakes-viberbot/web/config"
 	"github.com/triviy/parklakes-viberbot/web/handlers"
 	"github.com/triviy/parklakes-viberbot/web/middlewares"
@@ -43,6 +44,8 @@ func main() {
 	e.POST("/api/v1/car-owners/migrate", h.MigrateCarOwnersHandler.Handle, apiKeyAuth)
 	// e.POST("/api/v1/viber/set-webhook", handlers.SetWebhook)
 	// e.POST("/api/v1/viber/callback", handlers.SendMessage)
+
 	port := fmt.Sprintf(":%s", cfg.GetAppPort())
-	e.Logger.Fatal(e.Start(port))
+
+	web.GracefulShutdown(e, e.Start(port))
 }
