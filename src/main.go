@@ -3,7 +3,10 @@ package main
 import (
 	"context"
 	"fmt"
-	"log"
+	"os"
+	"time"
+
+	log "github.com/sirupsen/logrus"
 
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
@@ -13,6 +16,11 @@ import (
 )
 
 func main() {
+	log.SetFormatter(&log.JSONFormatter{
+		TimestampFormat: time.RFC3339Nano,
+	})
+	log.SetOutput(os.Stdout)
+
 	ctx := context.Background()
 	cfg, err := config.NewAPIConfig()
 	if err != nil {
@@ -25,11 +33,13 @@ func main() {
 	}
 
 	e := echo.New()
-	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
 	e.Use(middleware.RequestID())
+	e.Use(middlewares.CustomLogger())
 
-	apiKeyAuth := middlewares.GetAPIKeyAuthMiddleware(cfg.GetAPIKey())
+	apiKeyAuth := middlewares.APIKeyAuth(cfg.GetAPIKey())
+
+	e.GET("/health", h.HealthCheckHandler.Handle)
 	e.POST("/api/v1/car-owners/migrate", h.MigrateCarOwnersHandler.Handle, apiKeyAuth)
 	// e.POST("/api/v1/viber/set-webhook", handlers.SetWebhook)
 	// e.POST("/api/v1/viber/callback", handlers.SendMessage)

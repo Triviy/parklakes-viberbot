@@ -12,6 +12,7 @@ import (
 // Handlers collection
 type Handlers struct {
 	*MigrateCarOwnersHandler
+	*HealthCheckHandler
 }
 
 // InitializeHandlers creates handlers with all dependencies
@@ -28,12 +29,14 @@ func InitializeHandlers(ctx context.Context, cfg *config.APIConfig) (h *Handlers
 	if err != nil {
 		return
 	}
-
 	migrateCarOwnerCmd := commands.NewMigrateCarOwnersCmd(carOwnersRepo, carOwnerPropsRepo, gSpreadsheet)
 
 	migrateCarOwnerHandler := NewMigrateCarOwnersHandler(migrateCarOwnerCmd)
+	healthCheckHandler := NewHealthCheckHandler(datastore)
+
 	h = &Handlers{
 		migrateCarOwnerHandler,
+		healthCheckHandler,
 	}
 	return
 }

@@ -1,6 +1,8 @@
 package handlers
 
 import (
+	"net/http"
+
 	"github.com/labstack/echo"
 	"github.com/triviy/parklakes-viberbot/application/commands"
 )
@@ -22,5 +24,5 @@ func (h MigrateCarOwnersHandler) Handle(c echo.Context) error {
 		return err
 	}
 
-	return ok(c.Response())
+	return c.JSON(http.StatusOK, createOkResponse())
 }

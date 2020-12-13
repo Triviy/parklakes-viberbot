@@ -1,9 +1,10 @@
 package commands
 
 import (
-	"log"
 	"strings"
 	"time"
+
+	log "github.com/sirupsen/logrus"
 
 	"github.com/pkg/errors"
 	"github.com/triviy/parklakes-viberbot/application/integrations"

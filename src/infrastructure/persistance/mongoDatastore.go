@@ -54,6 +54,11 @@ func NewMongoDatastore(ctx context.Context, connectionString string) (ds *MongoD
 	return datastore, err
 }
 
+// Ping checks DB avaliability
+func (r MongoDatastore) Ping() error {
+	return r.Client.Ping(r.Context, nil)
+}
+
 func (r MongoDatastore) findOne(col *mongo.Collection, id string, e interface{}) error {
 	f := col.FindOne(r.Context, bson.M{"_id": id})
 

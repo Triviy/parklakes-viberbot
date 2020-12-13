@@ -4,7 +4,7 @@ package handlers
 // 	"bytes"
 // 	"encoding/json"
 // 	"fmt"
-// 	"log"
+// 	log "github.com/sirupsen/logrus"
 // 	"net/http"
 
 // 	"github.com/labstack/echo"
