@@ -19,7 +19,7 @@ func NewMigrateCarOwnersHandler(cmd *commands.MigrateCarOwnersCmd) *MigrateCarOw
 
 // Handle runs migration from Google SpreadSheet to database
 func (h MigrateCarOwnersHandler) Handle(c echo.Context) error {
-	err := h.cmd.Migrate()
+	err := h.cmd.Execute()
 	if err != nil {
 		return err
 	}

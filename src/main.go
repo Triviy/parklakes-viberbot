@@ -42,7 +42,7 @@ func main() {
 
 	e.GET("/health", h.HealthCheckHandler.Handle)
 	e.POST("/api/v1/car-owners/migrate", h.MigrateCarOwnersHandler.Handle, apiKeyAuth)
-	// e.POST("/api/v1/viber/set-webhook", handlers.SetWebhook)
+	e.POST("/api/v1/viber/set-webhook", h.SetWebhookHandler.Handle, apiKeyAuth)
 	// e.POST("/api/v1/viber/callback", handlers.SendMessage)
 
 	port := fmt.Sprintf(":%s", cfg.GetAppPort())

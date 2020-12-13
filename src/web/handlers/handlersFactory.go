@@ -12,6 +12,7 @@ import (
 // Handlers collection
 type Handlers struct {
 	*MigrateCarOwnersHandler
+	*SetWebhookHandler
 	*HealthCheckHandler
 }
 
@@ -29,13 +30,18 @@ func InitializeHandlers(ctx context.Context, cfg *config.APIConfig) (h *Handlers
 	if err != nil {
 		return
 	}
-	migrateCarOwnerCmd := commands.NewMigrateCarOwnersCmd(carOwnersRepo, carOwnerPropsRepo, gSpreadsheet)
 
+	migrateCarOwnerCmd := commands.NewMigrateCarOwnersCmd(carOwnersRepo, carOwnerPropsRepo, gSpreadsheet)
 	migrateCarOwnerHandler := NewMigrateCarOwnersHandler(migrateCarOwnerCmd)
+
 	healthCheckHandler := NewHealthCheckHandler(datastore)
+
+	setWebhookCmd := commands.NewSetWebhookCmd(cfg)
+	setWebhookHandler := NewSetWebhookHandler(setWebhookCmd)
 
 	h = &Handlers{
 		migrateCarOwnerHandler,
+		setWebhookHandler,
 		healthCheckHandler,
 	}
 	return

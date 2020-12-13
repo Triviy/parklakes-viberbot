@@ -38,8 +38,8 @@ func NewMigrateCarOwnersCmd(
 	}
 }
 
-// Migrate gets car owners data from Google SpreadSheet and stores it in DB
-func (cmd MigrateCarOwnersCmd) Migrate() error {
+// Execute gets car owners data from Google SpreadSheet and stores it in DB
+func (cmd MigrateCarOwnersCmd) Execute() error {
 	migrationTime, err := services.GetKyivTime()
 	if err != nil {
 		return err
