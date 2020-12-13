@@ -1,24 +1,38 @@
 package main
 
 import (
+	"context"
+	"fmt"
 	"log"
 
 	"github.com/labstack/echo"
-	"github.com/triviy/parklakes-viberbot/config"
-	"github.com/triviy/parklakes-viberbot/handlers"
+	"github.com/labstack/echo/middleware"
+	"github.com/triviy/parklakes-viberbot/web/config"
+	"github.com/triviy/parklakes-viberbot/web/handlers"
 	"github.com/triviy/parklakes-viberbot/web/middlewares"
 )
 
 func main() {
+	ctx := context.Background()
 	cfg, err := config.NewAPIConfig()
 	if err != nil {
 		log.Fatal(err)
 	}
 
+	h, err := handlers.InitializeHandlers(ctx, cfg)
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	e := echo.New()
-	e.Use(middlewares.ExtendWithAppContext())
-	e.POST("/api/v1/car-owners/migrate", handlers.MigrateCarOwners)
-	e.POST("/api/v1/viber/set-webhook", handlers.SetWebhook)
-	e.POST("/api/v1/viber/callback", handlers.SendMessage)
-	e.Logger.Fatal(e.Start(":8081"))
+	e.Use(middleware.Logger())
+	e.Use(middleware.Recover())
+	e.Use(middleware.RequestID())
+
+	apiKeyAuth := middlewares.GetAPIKeyAuthMiddleware(cfg.GetAPIKey())
+	e.POST("/api/v1/car-owners/migrate", h.MigrateCarOwnersHandler.Handle, apiKeyAuth)
+	// e.POST("/api/v1/viber/set-webhook", handlers.SetWebhook)
+	// e.POST("/api/v1/viber/callback", handlers.SendMessage)
+	port := fmt.Sprintf(":%s", cfg.GetAppPort())
+	e.Logger.Fatal(e.Start(port))
 }

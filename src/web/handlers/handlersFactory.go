@@ -1,0 +1,39 @@
+package handlers
+
+import (
+	"context"
+
+	"github.com/triviy/parklakes-viberbot/application/commands"
+	"github.com/triviy/parklakes-viberbot/application/integrations"
+	"github.com/triviy/parklakes-viberbot/infrastructure/persistance"
+	"github.com/triviy/parklakes-viberbot/web/config"
+)
+
+// Handlers collection
+type Handlers struct {
+	*MigrateCarOwnersHandler
+}
+
+// InitializeHandlers creates handlers with all dependencies
+func InitializeHandlers(ctx context.Context, cfg *config.APIConfig) (h *Handlers, err error) {
+	datastore, err := persistance.NewMongoDatastore(ctx, cfg.GetDBConnectionString())
+	if err != nil {
+		return
+	}
+
+	carOwnersRepo := persistance.NewCarOwnersRepo(datastore)
+	carOwnerPropsRepo := persistance.NewCarOwnerPropsRepo(datastore)
+
+	gSpreadsheet, err := integrations.NewGoogleSpreadsheet(ctx, cfg.GetSheetsAPIKey(), cfg.GetSheetsAPISpreadsheetID())
+	if err != nil {
+		return
+	}
+
+	migrateCarOwnerCmd := commands.NewMigrateCarOwnersCmd(carOwnersRepo, carOwnerPropsRepo, gSpreadsheet)
+
+	migrateCarOwnerHandler := NewMigrateCarOwnersHandler(migrateCarOwnerCmd)
+	h = &Handlers{
+		migrateCarOwnerHandler,
+	}
+	return
+}

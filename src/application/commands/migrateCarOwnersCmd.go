@@ -21,14 +21,14 @@ const (
 type MigrateCarOwnersCmd struct {
 	carOwnersRepo        interfaces.Repo
 	carOwnerPropsRepo    interfaces.Repo
-	carOwnersSpreadsheet integrations.GoogleSpreadsheet
+	carOwnersSpreadsheet *integrations.GoogleSpreadsheet
 }
 
 // NewMigrateCarOwnersCmd creates new instance of MigrateCarOwnersCmd
 func NewMigrateCarOwnersCmd(
 	carOwnersRepo interfaces.Repo,
 	carOwnerPropsRepo interfaces.Repo,
-	carOwnersSpreadsheet integrations.GoogleSpreadsheet,
+	carOwnersSpreadsheet *integrations.GoogleSpreadsheet,
 ) *MigrateCarOwnersCmd {
 	return &MigrateCarOwnersCmd{
 		carOwnersRepo,
@@ -126,7 +126,7 @@ func (cmd MigrateCarOwnersCmd) runDBMigration(cos map[string]models.CarOwner) er
 
 func (cmd MigrateCarOwnersCmd) getLastMigration() (time.Time, error) {
 	var prop models.CarOwnerProp
-	err := cmd.carOwnerPropsRepo.FindOne(lastMigrationTimeProp, prop)
+	err := cmd.carOwnerPropsRepo.FindOne(lastMigrationTimeProp, &prop)
 	if err != nil {
 		return services.ToKyivTime(defaultLastMigrationTime)
 	}

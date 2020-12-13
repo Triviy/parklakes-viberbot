@@ -18,19 +18,21 @@ type MongoDatastore struct {
 }
 
 var connectOnce sync.Once
+var datastore *MongoDatastore
 
 // NewMongoDatastore creates new NewMongoDatastore
 func NewMongoDatastore(ctx context.Context, connectionString string) (ds *MongoDatastore, err error) {
-	var db *mongo.Database
-	var c *mongo.Client
 	connectOnce.Do(func() {
+		if datastore != nil {
+			return
+		}
 		clientOptions := options.Client().ApplyURI(connectionString).SetDirect(true)
-		session, err := mongo.NewClient(clientOptions)
+		c, err := mongo.NewClient(clientOptions)
 		if err != nil {
 			err = errors.Wrap(err, "creating mongodb client failed")
 			return
 		}
-		err = session.Connect(ctx)
+		err = c.Connect(ctx)
 		if err != nil {
 			err = errors.Wrap(err, "connectiong to mongodb failed")
 			return
@@ -42,18 +44,14 @@ func NewMongoDatastore(ctx context.Context, connectionString string) (ds *MongoD
 			return
 		}
 
-		db = session.Database("cosmosdb-parklakes-viberbot")
+		db := c.Database("cosmosdb-parklakes-viberbot")
+		datastore = &MongoDatastore{
+			Database: db,
+			Client:   c,
+			Context:  ctx,
+		}
 	})
-	if err != nil {
-		return
-	}
-
-	ds = &MongoDatastore{
-		Database: db,
-		Client:   c,
-		Context:  ctx,
-	}
-	return
+	return datastore, err
 }
 
 func (r MongoDatastore) findOne(col *mongo.Collection, id string, e interface{}) error {
@@ -62,7 +60,7 @@ func (r MongoDatastore) findOne(col *mongo.Collection, id string, e interface{})
 	if err := f.Err(); err != nil {
 		return errors.Wrapf(err, "getting entity with id %s failed", id)
 	}
-	if err := f.Decode(&e); err != nil {
+	if err := f.Decode(e); err != nil {
 		return errors.Wrapf(err, "decoding entity with id %s failed", id)
 	}
 	return nil

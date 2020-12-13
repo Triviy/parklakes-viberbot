@@ -8,6 +8,8 @@ import (
 )
 
 type apiConfig struct {
+	AppPort  string `yaml:"appPort" env:"APP_PORT" env-default:"8081"`
+	APIKey   string `yaml:"apiKey" env:"API_KEY" env-required:"true"`
 	Database struct {
 		ConnectionString string `yaml:"connectionString" env:"DB_CONNECTION_STRING" env-required:"true"`
 	} `yaml:"database"`
@@ -28,21 +30,35 @@ type APIConfig struct {
 }
 
 // NewAPIConfig initalizes configuration for application
-func NewAPIConfig() (apiCfg *APIConfig, err error) {
+func NewAPIConfig() (*APIConfig, error) {
+	var apiConfig apiConfig
 	cfgFile := "config.yml"
 	if fileExists(cfgFile) {
-		err = cleanenv.ReadConfig("config.yml", &apiCfg.cfg)
+		err := cleanenv.ReadConfig("config.yml", &apiConfig)
+		if err != nil {
+			return nil, errors.Wrap(err, "creating config failed")
+		}
 	}
-	err = cleanenv.ReadEnv(&apiCfg.cfg)
+	err := cleanenv.ReadEnv(&apiConfig)
 	if err != nil {
-		err = errors.Wrap(err, "creating config failed")
+		return nil, errors.Wrap(err, "creating config failed")
 	}
-	return
+	return &APIConfig{&apiConfig}, nil
 }
 
 func fileExists(path string) bool {
 	_, err := os.Stat(path)
 	return !os.IsNotExist(err)
+}
+
+// GetAppPort returns application running port
+func (c APIConfig) GetAppPort() string {
+	return c.cfg.AppPort
+}
+
+// GetAPIKey returns API key required for internal use API
+func (c APIConfig) GetAPIKey() string {
+	return c.cfg.APIKey
 }
 
 // GetDBConnectionString returns database connection string from configuration
