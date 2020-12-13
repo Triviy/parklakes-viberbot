@@ -16,9 +16,8 @@ type apiConfig struct {
 		BaseURL    string `yaml:"baseURL" env:"VIBER_BASE_URL" env-required:"true"`
 	} `yaml:"viber"`
 	SheetsAPI struct {
-		SpreadsheetID   string `yaml:"spreadsheetID" env:"SHEETS_SPREADSHEET_ID" env-required:"true"`
-		CredentialsJSON string `yaml:"credentialsJSON" env:"SHEETS_API_CREDENTIALS_JSON" env-required:"true"`
-		TokenJSON       string `yaml:"tokenJSON" env:"SHEETS_API_TOKEN_JSON" env-required:"true"`
+		SpreadsheetID string `yaml:"spreadsheetID" env:"SHEETS_SPREADSHEET_ID" env-required:"true"`
+		APIKey        string `yaml:"apiKey" env:"SHEETS_API_KEY" env-required:"true"`
 	} `yaml:"sheetsAPI"`
 }
 
@@ -67,12 +66,7 @@ func (c APIConfig) GetSheetsAPISpreadsheetID() string {
 	return c.cfg.SheetsAPI.SpreadsheetID
 }
 
-// GetSheetsAPICredentialsJSON returns JSON credentials for authentication to Google SpreadSheet API
-func (c APIConfig) GetSheetsAPICredentialsJSON() string {
-	return c.cfg.SheetsAPI.CredentialsJSON
-}
-
-// GetSheetsAPITokenJSON returns JSON OAuth tokens obtained with GetSheetsAPICredentialsJSON
-func (c APIConfig) GetSheetsAPITokenJSON() string {
-	return c.cfg.SheetsAPI.TokenJSON
+// GetSheetsAPIKey returns APIKey with scoped access to Google SpreadSheet
+func (c APIConfig) GetSheetsAPIKey() string {
+	return c.cfg.SheetsAPI.APIKey
 }
