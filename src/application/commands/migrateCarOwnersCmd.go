@@ -7,7 +7,7 @@ import (
 	log "github.com/sirupsen/logrus"
 
 	"github.com/pkg/errors"
-	"github.com/triviy/parklakes-viberbot/application/integrations"
+	"github.com/triviy/parklakes-viberbot/application/integrations/google"
 	"github.com/triviy/parklakes-viberbot/domain/interfaces"
 	"github.com/triviy/parklakes-viberbot/domain/models"
 	"github.com/triviy/parklakes-viberbot/domain/services"
@@ -22,14 +22,14 @@ const (
 type MigrateCarOwnersCmd struct {
 	carOwnersRepo        interfaces.Repo
 	carOwnerPropsRepo    interfaces.Repo
-	carOwnersSpreadsheet *integrations.GoogleSpreadsheet
+	carOwnersSpreadsheet *google.Spreadsheet
 }
 
 // NewMigrateCarOwnersCmd creates new instance of MigrateCarOwnersCmd
 func NewMigrateCarOwnersCmd(
 	carOwnersRepo interfaces.Repo,
 	carOwnerPropsRepo interfaces.Repo,
-	carOwnersSpreadsheet *integrations.GoogleSpreadsheet,
+	carOwnersSpreadsheet *google.Spreadsheet,
 ) *MigrateCarOwnersCmd {
 	return &MigrateCarOwnersCmd{
 		carOwnersRepo,

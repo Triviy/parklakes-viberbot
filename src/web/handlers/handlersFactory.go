@@ -4,7 +4,7 @@ import (
 	"context"
 
 	"github.com/triviy/parklakes-viberbot/application/commands"
-	"github.com/triviy/parklakes-viberbot/application/integrations"
+	"github.com/triviy/parklakes-viberbot/application/integrations/google"
 	"github.com/triviy/parklakes-viberbot/infrastructure/persistance"
 	"github.com/triviy/parklakes-viberbot/web/config"
 )
@@ -26,7 +26,7 @@ func InitializeHandlers(ctx context.Context, cfg *config.APIConfig) (h *Handlers
 	carOwnersRepo := persistance.NewCarOwnersRepo(datastore)
 	carOwnerPropsRepo := persistance.NewCarOwnerPropsRepo(datastore)
 
-	gSpreadsheet, err := integrations.NewGoogleSpreadsheet(ctx, cfg.GetSheetsAPIKey(), cfg.GetSheetsAPISpreadsheetID())
+	gSpreadsheet, err := google.NewSpreadsheet(ctx, cfg.GetSheetsAPIKey(), cfg.GetSheetsAPISpreadsheetID())
 	if err != nil {
 		return
 	}
