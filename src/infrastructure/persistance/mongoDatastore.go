@@ -6,6 +6,7 @@ import (
 
 	"github.com/pkg/errors"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
@@ -69,8 +70,8 @@ func (r MongoDatastore) Disconnect() error {
 	return r.Client.Disconnect(r.Context)
 }
 
-func (r MongoDatastore) findOne(col *mongo.Collection, id string, e interface{}) error {
-	f := col.FindOne(r.Context, bson.M{"_id": id})
+func (r MongoDatastore) findOne(col *mongo.Collection, id string, e interface{}, opts ...*options.FindOneOptions) error {
+	f := col.FindOne(r.Context, bson.M{"_id": id}, opts...)
 
 	if err := f.Err(); err != nil {
 		return errors.Wrapf(err, "getting entity with id %s failed", id)
@@ -85,6 +86,13 @@ func (r MongoDatastore) upsert(col *mongo.Collection, id string, e interface{}) 
 	opts := options.Replace().SetUpsert(true)
 	if _, err := col.ReplaceOne(r.Context, bson.M{"_id": id}, e, opts); err != nil {
 		return errors.Wrapf(err, "upsert failed for entity with id %s", id)
+	}
+	return nil
+}
+
+func (r MongoDatastore) updateOne(col *mongo.Collection, id string, u primitive.M) error {
+	if _, err := col.UpdateOne(r.Context, bson.M{"_id": id}, u); err != nil {
+		return errors.Wrapf(err, "update failed for entity with id %s", id)
 	}
 	return nil
 }

@@ -7,4 +7,5 @@ type Subscriber struct {
 	Avatar       string   `json:"avatar,omitempty"`
 	Country      string   `json:"country,omitempty"`
 	PhoneNumbers []string `json:"phoneNumbers"`
+	Active       bool     `json:"active"`
 }

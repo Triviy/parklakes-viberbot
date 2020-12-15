@@ -20,15 +20,15 @@ const (
 
 // MigrateCarOwnersCmd runs migration
 type MigrateCarOwnersCmd struct {
-	carOwnersRepo        interfaces.Repo
-	carOwnerPropsRepo    interfaces.Repo
+	carOwnersRepo        interfaces.GenericRepo
+	carOwnerPropsRepo    interfaces.GenericRepo
 	carOwnersSpreadsheet *google.Spreadsheet
 }
 
 // NewMigrateCarOwnersCmd creates new instance of MigrateCarOwnersCmd
 func NewMigrateCarOwnersCmd(
-	carOwnersRepo interfaces.Repo,
-	carOwnerPropsRepo interfaces.Repo,
+	carOwnersRepo interfaces.GenericRepo,
+	carOwnerPropsRepo interfaces.GenericRepo,
 	carOwnersSpreadsheet *google.Spreadsheet,
 ) *MigrateCarOwnersCmd {
 	return &MigrateCarOwnersCmd{

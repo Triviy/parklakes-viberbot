@@ -14,11 +14,11 @@ import (
 // GetCarOwnerByTextCmd instance of viber webhook cmd
 type GetCarOwnerByTextCmd struct {
 	config        *config.APIConfig
-	carOwnersRepo interfaces.Repo
+	carOwnersRepo interfaces.GenericRepo
 }
 
 // NewGetCarOwnerByTextCmd creates new instance of GetCarOwnerByTextCmd
-func NewGetCarOwnerByTextCmd(config *config.APIConfig, carOwnersRepo interfaces.Repo) *GetCarOwnerByTextCmd {
+func NewGetCarOwnerByTextCmd(config *config.APIConfig, carOwnersRepo interfaces.GenericRepo) *GetCarOwnerByTextCmd {
 	return &GetCarOwnerByTextCmd{config, carOwnersRepo}
 }
 
