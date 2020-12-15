@@ -1,8 +1,18 @@
 package viber
 
+// Viber constants
 const (
-	// ViberSuccessStatus represents success status for any Viber API calls
-	ViberSuccessStatus = 0
+	SuccessStatus = 0
+
+	DeliveredEvent           = "delivered"
+	SeenEvent                = "seen"
+	FailedEvent              = "failed"
+	SubscribedEvent          = "subscribed"
+	UnsubscribedEvent        = "unsubscribed"
+	ConversationStartedEvent = "conversation_started"
+	MessageEvent             = "message"
+
+	TextType = "text"
 )
 
 type Callback struct {

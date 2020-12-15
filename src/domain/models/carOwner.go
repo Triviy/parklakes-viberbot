@@ -31,6 +31,8 @@ var replacer = strings.NewReplacer(
 	"У", "Y",
 	" ", "",
 	"-", "",
+	"\t", "",
+	"\n", "",
 )
 var standardNumberRegexp = regexp.MustCompile(`[A-Z]{2}[0-9]{4}[A-Z]{2}|[0-9]{5}[A-Z,А-Я,І]{2}|[A-Z]{3}[0-9]{3}`)
 

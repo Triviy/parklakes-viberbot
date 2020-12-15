@@ -25,12 +25,12 @@ func (cmd SetWebhookCmd) Execute() error {
 		AuthToken: cmd.config.GetViberAPIKey(),
 		URL:       cmd.config.GetViberWebhookURL(),
 		EventTypes: []string{
-			"delivered",
-			"seen",
-			"failed",
-			"subscribed",
-			"unsubscribed",
-			"conversation_started",
+			viber.DeliveredEvent,
+			viber.SeenEvent,
+			viber.FailedEvent,
+			viber.SubscribedEvent,
+			viber.UnsubscribedEvent,
+			viber.ConversationStartedEvent,
 		},
 		SendName:  true,
 		SendPhoto: true,
@@ -41,7 +41,7 @@ func (cmd SetWebhookCmd) Execute() error {
 	if err := integrations.SendPostRequest(apiURL, &request, &response); err != nil {
 		return err
 	}
-	if response.Status != viber.ViberSuccessStatus {
+	if response.Status != viber.SuccessStatus {
 		return errors.Errorf("Request to %s failed with Status=%v and StatusMessage='%s'", apiURL, response.Status, response.StatusMessage)
 	}
 	return nil
