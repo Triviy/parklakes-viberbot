@@ -23,7 +23,7 @@ func NewSetWebhookCmd(config *config.APIConfig) *SetWebhookCmd {
 func (cmd SetWebhookCmd) Execute() error {
 	request := viber.SetWebhookRequest{
 		AuthToken: cmd.config.GetViberAPIKey(),
-		URL:       cmd.config.GetViberWebhookURL(),
+		URL:       cmd.config.GetAppBaseURL(),
 		EventTypes: []string{
 			viber.DeliveredEvent,
 			viber.SeenEvent,

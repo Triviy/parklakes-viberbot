@@ -8,15 +8,15 @@ import (
 )
 
 type apiConfig struct {
-	AppPort  string `yaml:"appPort" env:"APP_PORT" env-default:"8081"`
-	APIKey   string `yaml:"apiKey" env:"API_KEY" env-required:"true"`
-	Database struct {
+	AppPort    string `yaml:"appPort" env:"PORT" env-default:"8081"`
+	AppBaseURL string `yaml:"appBaseURL" env:"WEBSITE_HOSTNAME" env-default:"http://localhost"`
+	APIKey     string `yaml:"apiKey" env:"API_KEY" env-required:"true"`
+	Database   struct {
 		ConnectionString string `yaml:"connectionString" env:"DB_CONNECTION_STRING" env-required:"true"`
 	} `yaml:"database"`
 	Viber struct {
-		APIKey     string `yaml:"apiKey" env:"VIBER_API_KEY" env-required:"true"`
-		WebhookURL string `yaml:"webhookURL" env:"VIBER_WEBHOOK_URL" env-required:"true"`
-		BaseURL    string `yaml:"baseURL" env:"VIBER_BASE_URL" env-required:"true"`
+		APIKey  string `yaml:"apiKey" env:"VIBER_API_KEY" env-required:"true"`
+		BaseURL string `yaml:"baseURL" env:"VIBER_BASE_URL" env-required:"true"`
 	} `yaml:"viber"`
 	SheetsAPI struct {
 		SpreadsheetID string `yaml:"spreadsheetID" env:"SHEETS_SPREADSHEET_ID" env-required:"true"`
@@ -61,6 +61,11 @@ func (c APIConfig) GetAPIKey() string {
 	return c.cfg.APIKey
 }
 
+// GetAppBaseURL returns application base URL
+func (c APIConfig) GetAppBaseURL() string {
+	return c.cfg.AppBaseURL
+}
+
 // GetDBConnectionString returns database connection string from configuration
 func (c APIConfig) GetDBConnectionString() string {
 	return c.cfg.Database.ConnectionString
@@ -69,11 +74,6 @@ func (c APIConfig) GetDBConnectionString() string {
 // GetViberAPIKey returns Viber AuthToken
 func (c APIConfig) GetViberAPIKey() string {
 	return c.cfg.Viber.APIKey
-}
-
-// GetViberWebhookURL returns Viber Webhook URL
-func (c APIConfig) GetViberWebhookURL() string {
-	return c.cfg.Viber.WebhookURL
 }
 
 // GetViberBaseURL returns Viber chatbot API URL
