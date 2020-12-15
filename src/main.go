@@ -17,12 +17,11 @@ import (
 )
 
 func main() {
-	log.Info("starting main")
-
 	log.SetFormatter(&log.JSONFormatter{
 		TimestampFormat: time.RFC3339Nano,
 	})
 	log.SetOutput(os.Stdout)
+	log.Info("Starting main")
 
 	ctx := context.Background()
 	cfg, err := config.NewAPIConfig()

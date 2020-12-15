@@ -22,7 +22,8 @@ var connectOnce sync.Once
 var datastore *MongoDatastore
 
 // NewMongoDatastore creates new NewMongoDatastore
-func NewMongoDatastore(ctx context.Context, connectionString string) (ds *MongoDatastore, err error) {
+func NewMongoDatastore(ctx context.Context, connectionString string) (*MongoDatastore, error) {
+	var syncError error
 	connectOnce.Do(func() {
 		if datastore != nil {
 			return
@@ -30,18 +31,18 @@ func NewMongoDatastore(ctx context.Context, connectionString string) (ds *MongoD
 		clientOptions := options.Client().ApplyURI(connectionString).SetDirect(true)
 		c, err := mongo.NewClient(clientOptions)
 		if err != nil {
-			err = errors.Wrap(err, "creating mongodb client failed")
+			syncError = errors.Wrap(err, "creating mongodb client failed")
 			return
 		}
 		err = c.Connect(ctx)
 		if err != nil {
-			err = errors.Wrap(err, "connectiong to mongodb failed")
+			syncError = errors.Wrap(err, "connectiong to mongodb failed")
 			return
 		}
 
 		err = c.Ping(ctx, nil)
 		if err != nil {
-			err = errors.Wrap(err, "pinging to mongodb failed")
+			syncError = errors.Wrap(err, "pinging to mongodb failed")
 			return
 		}
 
@@ -52,7 +53,7 @@ func NewMongoDatastore(ctx context.Context, connectionString string) (ds *MongoD
 			Context:  ctx,
 		}
 	})
-	return datastore, err
+	return datastore, syncError
 }
 
 // GetDatastore returns datastore instance
