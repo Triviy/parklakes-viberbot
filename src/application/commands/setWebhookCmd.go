@@ -21,9 +21,10 @@ func NewSetWebhookCmd(config *config.APIConfig) *SetWebhookCmd {
 
 // Execute calls setting Viber callback URLs
 func (cmd SetWebhookCmd) Execute() error {
+	webhookURL := fmt.Sprintf("https://%s/api/v1/viber/callback", cmd.config.GetAppBaseURL())
 	request := viber.SetWebhookRequest{
 		AuthToken: cmd.config.GetViberAPIKey(),
-		URL:       cmd.config.GetAppBaseURL(),
+		URL:       webhookURL,
 		EventTypes: []string{
 			viber.DeliveredEvent,
 			viber.SeenEvent,
