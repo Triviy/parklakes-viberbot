@@ -12,12 +12,25 @@ import (
 
 // CallbackHandler handles set webhook request
 type CallbackHandler struct {
-	cmd *commands.SetWebhookCmd
+	getCarOwnerByTextCmd *commands.GetCarOwnerByTextCmd
+	updateSubscriberCmd  *commands.UpdateSubscriberCmd
+	unsubscribeCmd       *commands.UnsubscribeCmd
+	welcomeCmd           *commands.WelcomeCmd
 }
 
 // NewCallbackHandler creates new handler instance
-func NewCallbackHandler(cmd *commands.SetWebhookCmd) *CallbackHandler {
-	return &CallbackHandler{cmd}
+func NewCallbackHandler(
+	getCarOwnerByTextCmd *commands.GetCarOwnerByTextCmd,
+	updateSubscriberCmd *commands.UpdateSubscriberCmd,
+	unsubscribeCmd *commands.UnsubscribeCmd,
+	welcomeCmd *commands.WelcomeCmd,
+) *CallbackHandler {
+	return &CallbackHandler{
+		getCarOwnerByTextCmd,
+		updateSubscriberCmd,
+		unsubscribeCmd,
+		welcomeCmd,
+	}
 }
 
 // Handle sets webhook url for Viber API callbacks
@@ -28,22 +41,24 @@ func (h CallbackHandler) Handle(c echo.Context) error {
 	}
 	switch r.Event {
 	case viber.SubscribedEvent:
-		logrus.Info("Save data about user")
+		if err := h.updateSubscriberCmd.Execute(&r.User, nil); err != nil {
+			return err
+		}
 	case viber.UnsubscribedEvent:
-		logrus.Info("Remove from database")
+		if err := h.unsubscribeCmd.Execute(r.UserID); err != nil {
+			return err
+		}
 	case viber.ConversationStartedEvent:
-		logrus.Info("Response with Welcome request")
+		r := h.welcomeCmd.Execute()
+		return c.JSON(http.StatusOK, r)
 	case viber.MessageEvent:
-		logrus.Info("Send message to user")
-		logrus.Info("Save data about user")
-		logrus.Info("Save contacts")
-	default:
-		logrus.Info("Log")
-	}
-
-	err := h.cmd.Execute()
-	if err != nil {
-		return err
+		sendErr := h.getCarOwnerByTextCmd.Execute(r.Message.Text, r.Sender.ID, r.Message.TrackingData)
+		if updateErr := h.updateSubscriberCmd.Execute(&r.User, &r.Message.Contact); updateErr != nil {
+			logrus.Error(updateErr)
+		}
+		if sendErr != nil {
+			return sendErr
+		}
 	}
 
 	return c.JSON(http.StatusOK, createOkResponse())

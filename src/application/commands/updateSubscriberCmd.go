@@ -16,8 +16,8 @@ type UpdateSubscriberCmd struct {
 }
 
 // NewUpdateSubscriberCmd creates new instance of UpdateSubscriberCmd
-func NewUpdateSubscriberCmd(carOwnersRepo interfaces.GenericRepo) *UpdateSubscriberCmd {
-	return &UpdateSubscriberCmd{carOwnersRepo}
+func NewUpdateSubscriberCmd(subscriberRepo interfaces.GenericRepo) *UpdateSubscriberCmd {
+	return &UpdateSubscriberCmd{subscriberRepo}
 }
 
 // Execute calls setting Viber callback URLs

@@ -11,8 +11,8 @@ type UnsubscribeCmd struct {
 }
 
 // NewUnsubscribeCmd creates new instance of UnsubscribeCmd
-func NewUnsubscribeCmd(carOwnersRepo interfaces.GenericRepo) *UnsubscribeCmd {
-	return &UnsubscribeCmd{carOwnersRepo}
+func NewUnsubscribeCmd(subscriberRepo interfaces.GenericRepo) *UnsubscribeCmd {
+	return &UnsubscribeCmd{subscriberRepo}
 }
 
 // Execute calls setting Viber callback URLs

@@ -12,6 +12,7 @@ import (
 // Handlers collection
 type Handlers struct {
 	*MigrateCarOwnersHandler
+	*CallbackHandler
 	*SetWebhookHandler
 	*HealthCheckHandler
 }
@@ -25,6 +26,7 @@ func InitializeHandlers(ctx context.Context, cfg *config.APIConfig) (h *Handlers
 
 	carOwnersRepo := persistance.NewCarOwnersRepo(datastore)
 	carOwnerPropsRepo := persistance.NewCarOwnerPropsRepo(datastore)
+	subscribersRepo := persistance.NewSubscribersRepo(datastore)
 
 	gSpreadsheet, err := google.NewSpreadsheet(ctx, cfg.GetSheetsAPIKey(), cfg.GetSheetsAPISpreadsheetID())
 	if err != nil {
@@ -34,13 +36,20 @@ func InitializeHandlers(ctx context.Context, cfg *config.APIConfig) (h *Handlers
 	migrateCarOwnerCmd := commands.NewMigrateCarOwnersCmd(carOwnersRepo, carOwnerPropsRepo, gSpreadsheet)
 	migrateCarOwnerHandler := NewMigrateCarOwnersHandler(migrateCarOwnerCmd)
 
-	healthCheckHandler := NewHealthCheckHandler(datastore)
+	getCarOwnerByTextCmd := commands.NewGetCarOwnerByTextCmd(cfg, carOwnersRepo)
+	updateSubscriberCmd := commands.NewUpdateSubscriberCmd(subscribersRepo)
+	unsubscribeCmd := commands.NewUnsubscribeCmd(subscribersRepo)
+	welcomeCmd := commands.NewWelcomeCmd()
+	callbackHandler := NewCallbackHandler(getCarOwnerByTextCmd, updateSubscriberCmd, unsubscribeCmd, welcomeCmd)
 
 	setWebhookCmd := commands.NewSetWebhookCmd(cfg)
 	setWebhookHandler := NewSetWebhookHandler(setWebhookCmd)
 
+	healthCheckHandler := NewHealthCheckHandler(datastore)
+
 	h = &Handlers{
 		migrateCarOwnerHandler,
+		callbackHandler,
 		setWebhookHandler,
 		healthCheckHandler,
 	}

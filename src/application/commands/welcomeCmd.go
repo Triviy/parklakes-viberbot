@@ -16,10 +16,9 @@ func NewWelcomeCmd() *WelcomeCmd {
 }
 
 // Execute calls setting Viber callback URLs
-func (cmd WelcomeCmd) Execute(trackingID string) *viber.WelcomeResponse {
+func (cmd WelcomeCmd) Execute() *viber.WelcomeResponse {
 	return &viber.WelcomeResponse{
-		TrackingData: trackingID,
-		Type:         viber.TextType,
-		Text:         "Вітаю! Введіть повний номер автівки, а я спробую вам допомогти",
+		Type: viber.TextType,
+		Text: "Вітаю! Введіть повний номер автівки, а я спробую вам допомогти",
 	}
 }
