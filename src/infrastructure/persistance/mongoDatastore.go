@@ -88,3 +88,10 @@ func (r MongoDatastore) upsert(col *mongo.Collection, id string, e interface{}) 
 	}
 	return nil
 }
+
+func (r MongoDatastore) deleteOne(col *mongo.Collection, id string) error {
+	if _, err := col.DeleteOne(r.Context, bson.M{"_id": id}); err != nil {
+		return errors.Wrapf(err, "delete failed for entity with id %s", id)
+	}
+	return nil
+}

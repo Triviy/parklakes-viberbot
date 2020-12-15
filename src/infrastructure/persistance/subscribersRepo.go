@@ -18,12 +18,17 @@ func NewSubscribersRepo(ds *MongoDatastore) *SubscribersRepo {
 	}
 }
 
-// FindOne returns car owners data from database by id
+// FindOne returns subscribers data from database by id
 func (r SubscribersRepo) FindOne(id string, e interface{}) error {
 	return r.datastore.findOne(r.Collection, id, e)
 }
 
-// Upsert inserts or updates car owner data
+// Upsert inserts or updates subscribers data
 func (r SubscribersRepo) Upsert(id string, e interface{}) error {
 	return r.datastore.upsert(r.Collection, id, e)
+}
+
+// DeleteOne deletes subscriber by id
+func (r SubscribersRepo) DeleteOne(id string) error {
+	return r.datastore.deleteOne(r.Collection, id)
 }

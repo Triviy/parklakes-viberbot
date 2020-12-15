@@ -27,3 +27,8 @@ func (r CarOwnerPropsRepo) FindOne(id string, e interface{}) error {
 func (r CarOwnerPropsRepo) Upsert(id string, e interface{}) error {
 	return r.datastore.upsert(r.Collection, id, e)
 }
+
+// DeleteOne deletes props by id
+func (r CarOwnerPropsRepo) DeleteOne(id string) error {
+	return r.datastore.deleteOne(r.Collection, id)
+}
