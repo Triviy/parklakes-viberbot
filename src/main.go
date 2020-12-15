@@ -46,6 +46,5 @@ func main() {
 	e.POST("/api/v1/viber/callback", h.CallbackHandler.Handle, middlewares.ViberAPIKeyAuth(cfg.GetViberAPIKey()))
 
 	port := fmt.Sprintf(":%s", cfg.GetAppPort())
-
 	web.GracefulShutdown(e, e.Start(port))
 }
