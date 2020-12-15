@@ -17,6 +17,8 @@ import (
 )
 
 func main() {
+	log.Info("starting main")
+
 	log.SetFormatter(&log.JSONFormatter{
 		TimestampFormat: time.RFC3339Nano,
 	})
@@ -26,11 +28,13 @@ func main() {
 	cfg, err := config.NewAPIConfig()
 	if err != nil {
 		log.Fatal(err)
+		return
 	}
 
 	h, err := handlers.InitializeHandlers(ctx, cfg)
 	if err != nil {
 		log.Fatal(err)
+		return
 	}
 
 	e := echo.New()
@@ -46,6 +50,6 @@ func main() {
 	e.POST("/api/v1/viber/callback", h.CallbackHandler.Handle, middlewares.ViberAPIKeyAuth(cfg.GetViberAPIKey()))
 
 	port := fmt.Sprintf(":%s", cfg.GetAppPort())
-
+	log.Infof("starting host on port %s", port)
 	web.GracefulShutdown(e, e.Start(port))
 }
