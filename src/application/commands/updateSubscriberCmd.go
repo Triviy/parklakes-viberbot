@@ -30,7 +30,7 @@ func (cmd UpdateSubscriberCmd) Execute(user *viber.User, contact *viber.Contact)
 	opts := options.FindOne()
 	opts.Projection = bson.M{"phoneNumbers": 1}
 	logrus.Info("executung cmd.subscriberRepo.FindOne")
-	if err := cmd.subscriberRepo.FindOne(user.ID, &phonesProjection, opts); err != nil {
+	if err := cmd.subscriberRepo.FindOne(user.ID, phonesProjection, opts); err != nil {
 		if !errors.Is(err, mongo.ErrNoDocuments) {
 			return err
 		}
