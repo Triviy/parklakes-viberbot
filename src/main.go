@@ -49,6 +49,5 @@ func main() {
 	e.POST("/api/v1/viber/callback", h.CallbackHandler.Handle, middlewares.ViberHashCheck(cfg.GetViberAPIKey()))
 
 	port := fmt.Sprintf(":%s", cfg.GetAppPort())
-	log.Infof("starting host on port %s", port)
 	web.GracefulShutdown(e, e.Start(port))
 }

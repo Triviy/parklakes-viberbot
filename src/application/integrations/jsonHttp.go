@@ -15,7 +15,7 @@ func SendPostRequest(url string, request interface{}, response interface{}) erro
 	if err != nil {
 		return errors.Wrap(err, "serialization of request failed")
 	}
-	logrus.WithField("details", &request).Infof("---- Start request to %s", url)
+	logrus.WithField("details", &request).Infof("---- Sending HTTP Request to %s", url)
 	resp, err := http.Post(url, "application/json", bytes.NewBuffer(bytesRepresentation))
 	if err != nil {
 		return errors.Wrapf(err, "sending request to %s failed", url)
@@ -24,6 +24,6 @@ func SendPostRequest(url string, request interface{}, response interface{}) erro
 	if err != nil {
 		return errors.Wrap(err, "deserialization of response failed")
 	}
-	logrus.WithField("details", &response).Infof("---- End request to %s", url)
+	logrus.WithField("details", &response).Infof("---- Receiving HTTP response from %s", url)
 	return nil
 }
