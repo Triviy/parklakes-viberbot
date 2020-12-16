@@ -35,11 +35,12 @@ func NewCallbackHandler(
 
 // Handle sets webhook url for Viber API callbacks
 func (h CallbackHandler) Handle(c echo.Context) error {
+	logrus.Info("start callbachHandler.Handle")
 	var r viber.Callback
 	if err := c.Bind(&r); err != nil {
 		return errors.Wrap(err, "binding of callback failed")
 	}
-
+	logrus.Info("start callbachHandler.switch")
 	switch r.Event {
 	case viber.SubscribedEvent:
 		if err := h.updateSubscriberCmd.Execute(&r.User, nil); err != nil {
@@ -61,6 +62,6 @@ func (h CallbackHandler) Handle(c echo.Context) error {
 			return sendErr
 		}
 	}
-
+	logrus.Info("start callbachHandler.JSON")
 	return c.JSON(http.StatusOK, createOkResponse())
 }
