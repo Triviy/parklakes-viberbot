@@ -32,7 +32,7 @@ func CustomLogger() echo.MiddlewareFunc {
 				UserAgent:     req.UserAgent(),
 				RequestID:     req.Header.Get(echo.HeaderXRequestID),
 				ContentLength: req.ContentLength,
-			}).Info("--> Request start")
+			}).Info("-- Start request")
 
 			start := time.Now()
 			if err = next(ctx); err != nil {
@@ -49,7 +49,7 @@ func CustomLogger() echo.MiddlewareFunc {
 				RequestID:  res.Header().Get(echo.HeaderXRequestID),
 				StackTrace: getStackTrace(err),
 				Latency:    stop.Sub(start).String(),
-			}).Info("<-- Request end")
+			}).Info("-- End request")
 			return nil
 		}
 	}

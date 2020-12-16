@@ -17,7 +17,7 @@ import (
 )
 
 func main() {
-	log.SetFormatter(&log.JSONFormatter{
+	log.SetFormatter(&log.TextFormatter{
 		TimestampFormat: time.RFC3339Nano,
 	})
 	log.SetOutput(os.Stdout)
