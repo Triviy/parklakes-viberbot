@@ -25,6 +25,6 @@ func SendPostRequest(url string, request interface{}, response interface{}) erro
 	if err != nil {
 		return errors.Wrap(err, "deserialization of response failed")
 	}
-	logrus.WithField("request", &response).Infof("Response from %s", url)
+	logrus.WithField("response", &response).Infof("Response from %s", url)
 	return nil
 }

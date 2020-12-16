@@ -31,14 +31,15 @@ func CustomLogger() echo.MiddlewareFunc {
 				Method:        req.Method,
 				URI:           req.RequestURI,
 				Path:          req.URL.Path,
+				StatusCode:    res.Status,
+				Error:         getErrorText(err),
 				RemoteIP:      ctx.RealIP(),
 				Host:          req.Host,
 				Protocol:      req.Proto,
 				Referer:       req.Referer(),
 				UserAgent:     req.UserAgent(),
 				RequestID:     getRequestID(req, res),
-				StatusCode:    res.Status,
-				Error:         getErrorText(err),
+				StackTrace:    getStackTrace(err),
 				ContentLength: req.ContentLength,
 				Latency:       stop.Sub(start).String(),
 			}).Info("New request")
@@ -48,19 +49,20 @@ func CustomLogger() echo.MiddlewareFunc {
 }
 
 type logEntry struct {
+	StatusCode    int    `json:"statusCode"`
+	Error         string `json:"error"`
 	Method        string `json:"method"`
 	URI           string `json:"uri"`
 	Path          string `json:"path"`
-	RemoteIP      string `json:"remote_ip"`
+	RemoteIP      string `json:"remoteIp"`
 	Host          string `json:"host"`
 	Protocol      string `json:"protocol"`
 	Referer       string `json:"referer"`
-	UserAgent     string `json:"user_agent"`
-	RequestID     string `json:"request_id"`
-	StatusCode    int    `json:"status_code"`
-	Error         string `json:"error"`
-	ContentLength int64  `json:"content_length"`
+	UserAgent     string `json:"userAgent"`
+	RequestID     string `json:"requestId"`
+	ContentLength int64  `json:"contentLength"`
 	Latency       string `json:"latency"`
+	StackTrace    string `json:"stackTrace"`
 }
 
 func getRequestID(req *http.Request, res *echo.Response) string {
@@ -75,10 +77,16 @@ func getErrorText(err error) string {
 	if err == nil {
 		return ""
 	}
+	return err.Error()
+}
+
+func getStackTrace(err error) string {
+	if err == nil {
+		return ""
+	}
 
 	if pkgErr, ok := err.(stackTracer); ok {
 		var sb strings.Builder
-		sb.WriteString(fmt.Sprintf("%s\n", err.Error()))
 		for _, f := range pkgErr.StackTrace() {
 			sb.WriteString(fmt.Sprintf("%+s:%d\n", f, f))
 		}

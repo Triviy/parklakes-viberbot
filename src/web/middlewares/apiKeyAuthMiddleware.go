@@ -14,13 +14,3 @@ func APIKeyAuth(apiKey string) echo.MiddlewareFunc {
 		},
 	})
 }
-
-// ViberAPIKeyAuth gets middleware for validating Viber callbacks
-func ViberAPIKeyAuth(apiKey string) echo.MiddlewareFunc {
-	return middleware.KeyAuthWithConfig(middleware.KeyAuthConfig{
-		KeyLookup: "header:X-Viber-Auth-Token",
-		Validator: func(s string, e echo.Context) (bool, error) {
-			return apiKey == s, nil
-		},
-	})
-}
