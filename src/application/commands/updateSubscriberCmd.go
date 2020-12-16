@@ -2,6 +2,7 @@ package commands
 
 import (
 	"github.com/pkg/errors"
+	"github.com/sirupsen/logrus"
 	"github.com/triviy/parklakes-viberbot/application/integrations/viber"
 	"github.com/triviy/parklakes-viberbot/domain/interfaces"
 	"github.com/triviy/parklakes-viberbot/domain/models"
@@ -27,8 +28,8 @@ func (cmd UpdateSubscriberCmd) Execute(user *viber.User, contact *viber.Contact)
 	}
 	var phonesProjection map[string][]string
 	opts := options.FindOne()
-	opts.Projection = bson.M{"phoneNumbers": 1, "_id": 0}
-
+	opts.Projection = bson.M{"phoneNumbers": 1}
+	logrus.Info("executung cmd.subscriberRepo.FindOne")
 	if err := cmd.subscriberRepo.FindOne(user.ID, &phonesProjection, opts); err != nil {
 		if !errors.Is(err, mongo.ErrNoDocuments) {
 			return err
@@ -41,16 +42,21 @@ func (cmd UpdateSubscriberCmd) Execute(user *viber.User, contact *viber.Contact)
 		Country: user.Country,
 		Active:  true,
 	}
+
+	logrus.Info("getting phoneNumbers")
 	if val, ok := phonesProjection["phoneNumbers"]; ok && len(phonesProjection["phoneNumbers"]) > 0 {
 		copy(val, newSub.PhoneNumbers)
+		logrus.Info("copy phoneNumbers")
 	}
+	logrus.Info("checking contacts")
 	if contact != nil && len(contact.PhoneNumber) > 5 && !contains(newSub.PhoneNumbers, contact.PhoneNumber) {
 		newSub.PhoneNumbers = append(newSub.PhoneNumbers, contact.PhoneNumber)
 	}
-
+	logrus.Info("executing cmd.subscriberRepo.Upsert")
 	if err := cmd.subscriberRepo.Upsert(user.ID, &newSub); err != nil {
 		return err
 	}
+	logrus.Info("returning")
 	return nil
 }
 

@@ -61,8 +61,9 @@ func (cmd GetCarOwnerByTextCmd) getUsersResponseByText(input string) (text strin
 	if co.Owner != "" {
 		sb.WriteString(fmt.Sprintf("\nВласник автівки %s", co.Owner))
 	}
+	sb.WriteString(fmt.Sprintf("\nНомер телефону: %s", co.Phones[0]))
 	if len(co.Phones) > 1 {
 		sb.WriteString(fmt.Sprintf("\nДодатковый: %s", co.Phones[1]))
 	}
-	return sb.String(), nil
+	return text, nil
 }
