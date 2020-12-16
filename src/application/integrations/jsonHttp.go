@@ -11,12 +11,11 @@ import (
 
 // SendPostRequest sends JSON HTTP request
 func SendPostRequest(url string, request interface{}, response interface{}) error {
-	logrus.WithField("request", &request).Infof("Request to %s", url)
 	bytesRepresentation, err := json.Marshal(request)
 	if err != nil {
 		return errors.Wrap(err, "serialization of request failed")
 	}
-
+	logrus.WithField("details", &request).Infof("----> Request to %s", url)
 	resp, err := http.Post(url, "application/json", bytes.NewBuffer(bytesRepresentation))
 	if err != nil {
 		return errors.Wrapf(err, "sending request to %s failed", url)
@@ -25,6 +24,6 @@ func SendPostRequest(url string, request interface{}, response interface{}) erro
 	if err != nil {
 		return errors.Wrap(err, "deserialization of response failed")
 	}
-	logrus.WithField("response", &response).Infof("Response from %s", url)
+	logrus.WithField("details", &response).Infof("<---- Response from %s", url)
 	return nil
 }

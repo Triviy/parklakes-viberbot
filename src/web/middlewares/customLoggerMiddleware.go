@@ -2,7 +2,6 @@ package middlewares
 
 import (
 	"fmt"
-	"net/http"
 	"strings"
 	"time"
 
@@ -21,36 +20,42 @@ func CustomLogger() echo.MiddlewareFunc {
 		return func(ctx echo.Context) (err error) {
 			req := ctx.Request()
 			res := ctx.Response()
+
+			log.WithField("details", requestLogEntry{
+				Method:        req.Method,
+				URI:           req.RequestURI,
+				Path:          req.URL.Path,
+				RemoteIP:      ctx.RealIP(),
+				Host:          req.Host,
+				Protocol:      req.Proto,
+				Referer:       req.Referer(),
+				UserAgent:     req.UserAgent(),
+				RequestID:     req.Header.Get(echo.HeaderXRequestID),
+				ContentLength: req.ContentLength,
+			}).Info("--> Request start")
+
 			start := time.Now()
 			if err = next(ctx); err != nil {
 				ctx.Error(err)
 			}
 			stop := time.Now()
 			// add some default fields to the logger ~ on all messages
-			log.WithField("request", logEntry{
-				Method:        req.Method,
-				URI:           req.RequestURI,
-				Path:          req.URL.Path,
-				StatusCode:    res.Status,
-				Error:         getErrorText(err),
-				RemoteIP:      ctx.RealIP(),
-				Host:          req.Host,
-				Protocol:      req.Proto,
-				Referer:       req.Referer(),
-				UserAgent:     req.UserAgent(),
-				RequestID:     getRequestID(req, res),
-				StackTrace:    getStackTrace(err),
-				ContentLength: req.ContentLength,
-				Latency:       stop.Sub(start).String(),
-			}).Info("New request")
+			log.WithField("details", responseLogEntry{
+				Method:     req.Method,
+				URI:        req.RequestURI,
+				Path:       req.URL.Path,
+				StatusCode: res.Status,
+				Error:      getErrorText(err),
+				RequestID:  res.Header().Get(echo.HeaderXRequestID),
+				StackTrace: getStackTrace(err),
+				Latency:    stop.Sub(start).String(),
+			}).Info("<-- Request end")
 			return nil
 		}
 	}
 }
 
-type logEntry struct {
-	StatusCode    int    `json:"statusCode"`
-	Error         string `json:"error"`
+type requestLogEntry struct {
 	Method        string `json:"method"`
 	URI           string `json:"uri"`
 	Path          string `json:"path"`
@@ -61,16 +66,17 @@ type logEntry struct {
 	UserAgent     string `json:"userAgent"`
 	RequestID     string `json:"requestId"`
 	ContentLength int64  `json:"contentLength"`
-	Latency       string `json:"latency"`
-	StackTrace    string `json:"stackTrace"`
 }
 
-func getRequestID(req *http.Request, res *echo.Response) string {
-	id := req.Header.Get(echo.HeaderXRequestID)
-	if id == "" {
-		id = res.Header().Get(echo.HeaderXRequestID)
-	}
-	return id
+type responseLogEntry struct {
+	StatusCode int    `json:"statusCode"`
+	Error      string `json:"error"`
+	Method     string `json:"method"`
+	URI        string `json:"uri"`
+	Path       string `json:"path"`
+	RequestID  string `json:"requestId"`
+	Latency    string `json:"latency"`
+	StackTrace string `json:"stackTrace"`
 }
 
 func getErrorText(err error) string {
