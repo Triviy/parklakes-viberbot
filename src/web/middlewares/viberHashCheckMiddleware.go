@@ -18,6 +18,8 @@ func ViberHashCheck(apiKey string) echo.MiddlewareFunc {
 		Validator: func(actualHash string, e echo.Context) (bool, error) {
 			mac := hmac.New(sha256.New, []byte(apiKey))
 			body, err := e.Request().GetBody()
+			defer body.Close()
+
 			if err != nil {
 				return false, errors.Wrap(err, "getting body from request failed")
 			}
