@@ -53,7 +53,7 @@ func (cmd UpdateSubscriberCmd) Execute(user *viber.User, contact *viber.Contact)
 		newSub.PhoneNumbers = append(newSub.PhoneNumbers, contact.PhoneNumber)
 	}
 	logrus.Info("executing cmd.subscriberRepo.Upsert")
-	if err := cmd.subscriberRepo.Upsert(user.ID, &newSub); err != nil {
+	if err := cmd.subscriberRepo.Upsert(user.ID, newSub); err != nil {
 		return err
 	}
 	logrus.Info("returning")
