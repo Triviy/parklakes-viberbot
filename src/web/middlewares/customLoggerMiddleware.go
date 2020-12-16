@@ -18,9 +18,10 @@ type stackTracer interface {
 func CustomLogger() echo.MiddlewareFunc {
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(ctx echo.Context) (err error) {
+			log.Info("in CustomLogger")
 			req := ctx.Request()
 			res := ctx.Response()
-
+			log.Info("before log.WithField")
 			log.WithField("details", requestLogEntry{
 				Method:        req.Method,
 				URI:           req.RequestURI,
@@ -34,12 +35,14 @@ func CustomLogger() echo.MiddlewareFunc {
 				ContentLength: req.ContentLength,
 			}).Info("-- Start request")
 
+			log.Info("before next(ctx)")
 			start := time.Now()
 			if err = next(ctx); err != nil {
 				ctx.Error(err)
 			}
 			stop := time.Now()
 			// add some default fields to the logger ~ on all messages
+			log.Info("before log.WithField-2")
 			log.WithField("details", responseLogEntry{
 				Method:     req.Method,
 				URI:        req.RequestURI,
