@@ -1,8 +1,6 @@
 package handlers
 
 import (
-	"encoding/json"
-	"io/ioutil"
 	"net/http"
 
 	"github.com/labstack/echo"
@@ -37,13 +35,8 @@ func NewCallbackHandler(
 
 // Handle sets webhook url for Viber API callbacks
 func (h CallbackHandler) Handle(c echo.Context) error {
-	b, err := ioutil.ReadAll(c.Request().Body)
-	if err != nil {
-		return errors.Unwrap(err)
-	}
-
 	var r viber.Callback
-	if err := json.Unmarshal(b, &r); err != nil {
+	if err := c.Bind(&r); err != nil {
 		return errors.Wrap(err, "binding of callback failed")
 	}
 

@@ -1,9 +1,11 @@
 package middlewares
 
 import (
+	"bytes"
 	"crypto/hmac"
 	"crypto/sha256"
 	"encoding/hex"
+	"io"
 	"io/ioutil"
 
 	"github.com/labstack/echo"
@@ -16,7 +18,11 @@ func ViberHashCheck(apiKey string) echo.MiddlewareFunc {
 		KeyLookup: "header:X-Viber-Content-Signature",
 		Validator: func(actualHash string, e echo.Context) (bool, error) {
 			mac := hmac.New(sha256.New, []byte(apiKey))
-			b, err := ioutil.ReadAll(e.Request().Body)
+
+			var buf bytes.Buffer
+			tee := io.TeeReader(e.Request().Body, &buf)
+			b, err := ioutil.ReadAll(tee)
+
 			if err != nil {
 				return false, err
 			}
