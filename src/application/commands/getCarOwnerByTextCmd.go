@@ -2,6 +2,7 @@ package commands
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/pkg/errors"
 	"github.com/triviy/parklakes-viberbot/application/integrations/viber"
@@ -55,9 +56,13 @@ func (cmd GetCarOwnerByTextCmd) getUsersResponseByText(input string) (text strin
 		}
 		return "", err
 	}
-	text = fmt.Sprintf("Я знайшов 😄\nВласник автівки %s\nНомер телефону: %s", co.Owner, co.Phones[0])
-	if len(co.Phones) > 1 {
-		text += fmt.Sprintf("Додатковый: %s", co.Phones[1])
+	var sb strings.Builder
+	sb.WriteString("Я знайшов 😄")
+	if co.Owner != "" {
+		sb.WriteString(fmt.Sprintf("\nВласник автівки %s", co.Owner))
 	}
-	return text, nil
+	if len(co.Phones) > 1 {
+		sb.WriteString(fmt.Sprintf("\nДодатковый: %s", co.Phones[1]))
+	}
+	return sb.String(), nil
 }
