@@ -16,7 +16,7 @@ type Callback struct {
 
 // User is Viber full users contract
 type User struct {
-	ID         string `json:"_id"`
+	ID         string `json:"id"`
 	Name       string `json:"name"`
 	Avatar     string `json:"avatar,omitempty"`
 	Country    string `json:"country,omitempty"`
