@@ -20,16 +20,16 @@ func ViberHashCheck(apiKey string) echo.MiddlewareFunc {
 			req := e.Request()
 			mac := hmac.New(sha256.New, []byte(apiKey))
 			b, err := ioutil.ReadAll(req.Body)
+			defer func() {
+				req.Body.Close()
+				req.Body = ioutil.NopCloser(bytes.NewBuffer(b))
+			}()
 
 			if err != nil {
 				return false, errors.Wrap(err, "getting bytes from request body failed")
 			}
 			mac.Write(b)
 			expectedHash := hex.EncodeToString(mac.Sum(nil))
-
-			req.Body.Close()
-			req.Body = ioutil.NopCloser(bytes.NewBuffer(b))
-
 			return hmac.Equal([]byte(actualHash), []byte(expectedHash)), nil
 		},
 	})
