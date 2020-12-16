@@ -3,6 +3,7 @@ package middlewares
 import (
 	"crypto/hmac"
 	"crypto/sha256"
+	"encoding/hex"
 	"io/ioutil"
 
 	"github.com/labstack/echo"
@@ -26,7 +27,9 @@ func ViberHashCheck(apiKey string) echo.MiddlewareFunc {
 			mac.Write(b)
 			expectedHash := mac.Sum(nil)
 			logrus.Infof("Body: %v", string(b))
-			logrus.Infof("Expected hash: %s", expectedHash)
+			logrus.Infof("Expected hash: %s", string(expectedHash))
+			logrus.Infof("Expected encoded hash: %s", hex.EncodeToString(expectedHash))
+
 			return hmac.Equal([]byte(hash), expectedHash), nil
 		},
 	})
