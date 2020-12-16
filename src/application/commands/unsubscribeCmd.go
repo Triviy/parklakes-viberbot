@@ -1,6 +1,8 @@
 package commands
 
 import (
+	"errors"
+
 	"github.com/triviy/parklakes-viberbot/domain/interfaces"
 	"go.mongodb.org/mongo-driver/bson"
 )
@@ -17,6 +19,9 @@ func NewUnsubscribeCmd(subscriberRepo interfaces.GenericRepo) *UnsubscribeCmd {
 
 // Execute calls setting Viber callback URLs
 func (cmd UnsubscribeCmd) Execute(userID string) error {
+	if userID == "" {
+		return errors.New("Got empty userID")
+	}
 	if err := cmd.subscriberRepo.UpdateOne(userID, bson.M{"active": false}); err != nil {
 		return err
 	}

@@ -22,6 +22,9 @@ func NewUpdateSubscriberCmd(subscriberRepo interfaces.GenericRepo) *UpdateSubscr
 
 // Execute calls setting Viber callback URLs
 func (cmd UpdateSubscriberCmd) Execute(user *viber.User, contact *viber.Contact) error {
+	if user == nil {
+		return errors.New("viber.User is nil")
+	}
 	var phonesProjection map[string][]string
 	opts := options.FindOne()
 	opts.Projection = bson.M{"phoneNumbers": 1, "_id": 0}
@@ -41,7 +44,7 @@ func (cmd UpdateSubscriberCmd) Execute(user *viber.User, contact *viber.Contact)
 	if val, ok := phonesProjection["phoneNumbers"]; ok && len(phonesProjection["phoneNumbers"]) > 0 {
 		copy(val, newSub.PhoneNumbers)
 	}
-	if len(contact.PhoneNumber) > 5 && !contains(newSub.PhoneNumbers, contact.PhoneNumber) {
+	if contact != nil && len(contact.PhoneNumber) > 5 && !contains(newSub.PhoneNumbers, contact.PhoneNumber) {
 		newSub.PhoneNumbers = append(newSub.PhoneNumbers, contact.PhoneNumber)
 	}
 

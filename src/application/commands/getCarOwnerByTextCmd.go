@@ -23,8 +23,11 @@ func NewGetCarOwnerByTextCmd(config *config.APIConfig, carOwnersRepo interfaces.
 }
 
 // Execute calls setting Viber callback URLs
-func (cmd GetCarOwnerByTextCmd) Execute(input string, userID string, trackingID string) error {
-	text, err := cmd.getUsersResponseByText(input)
+func (cmd GetCarOwnerByTextCmd) Execute(cm *viber.CallbackMessage, userID string) error {
+	if cm == nil {
+		return errors.New("viber.CallbackMessage is nil")
+	}
+	text, err := cmd.getUsersResponseByText(cm.Text)
 	if err != nil {
 		return err
 	}
@@ -34,7 +37,7 @@ func (cmd GetCarOwnerByTextCmd) Execute(input string, userID string, trackingID 
 		Receiver:     userID,
 		Type:         viber.TextType,
 		Text:         text,
-		TrackingData: trackingID,
+		TrackingData: cm.TrackingData,
 	}
 
 	return viber.SendMessage(&request, cmd.config.GetViberBaseURL())
