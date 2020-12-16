@@ -26,10 +26,10 @@ func (cmd UpdateSubscriberCmd) Execute(user *viber.User, contact *viber.Contact)
 	if user == nil {
 		return errors.New("viber.User is nil")
 	}
-	var phonesProjection map[string][]string
+	var subPhones models.Subscriber
 	opts := options.FindOne().SetProjection(bson.M{"phoneNumbers": 1})
 	logrus.Info("executung cmd.subscriberRepo.FindOne")
-	if err := cmd.subscriberRepo.FindOne(user.ID, phonesProjection, opts); err != nil {
+	if err := cmd.subscriberRepo.FindOne(user.ID, &subPhones, opts); err != nil {
 		if !errors.Is(err, mongo.ErrNoDocuments) {
 			return err
 		}
@@ -43,8 +43,8 @@ func (cmd UpdateSubscriberCmd) Execute(user *viber.User, contact *viber.Contact)
 	}
 
 	logrus.Info("getting phoneNumbers")
-	if val, ok := phonesProjection["phoneNumbers"]; ok && len(phonesProjection["phoneNumbers"]) > 0 {
-		copy(val, newSub.PhoneNumbers)
+	if subPhones.PhoneNumbers != nil && len(subPhones.PhoneNumbers) > 0 {
+		copy(subPhones.PhoneNumbers, newSub.PhoneNumbers)
 		logrus.Info("copy phoneNumbers")
 	}
 	logrus.Info("checking contacts")
