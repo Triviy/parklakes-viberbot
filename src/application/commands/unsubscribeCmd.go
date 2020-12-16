@@ -22,7 +22,9 @@ func (cmd UnsubscribeCmd) Execute(userID string) error {
 	if userID == "" {
 		return errors.New("Got empty userID")
 	}
-	if err := cmd.subscriberRepo.UpdateOne(userID, bson.M{"active": false}); err != nil {
+	if err := cmd.subscriberRepo.UpdateOne(userID, bson.M{
+		"$set": bson.M{"active": false},
+	}); err != nil {
 		return err
 	}
 	return nil
