@@ -54,7 +54,7 @@ func (h CallbackHandler) Handle(c echo.Context) error {
 		r := h.welcomeCmd.Execute()
 		return c.JSON(http.StatusOK, r)
 	case viber.MessageEvent:
-		sendErr := h.getCarOwnerByTextCmd.Execute(r.Message.Text, r.Sender.ID, r.Message.TrackingData)
+		sendErr := h.getCarOwnerByTextCmd.Execute(r.Message, r.Sender.ID)
 		if updateErr := h.updateSubscriberCmd.Execute(r.Sender, r.Message.Contact); updateErr != nil {
 			logrus.Error(updateErr)
 		}
