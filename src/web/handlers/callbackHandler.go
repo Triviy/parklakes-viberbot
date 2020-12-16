@@ -43,7 +43,7 @@ func (h CallbackHandler) Handle(c echo.Context) error {
 	logrus.Info("start callbachHandler.switch")
 	switch r.Event {
 	case viber.SubscribedEvent:
-		if err := h.updateSubscriberCmd.Execute(&r.User, nil); err != nil {
+		if err := h.updateSubscriberCmd.Execute(r.User, nil); err != nil {
 			return err
 		}
 	case viber.UnsubscribedEvent:
@@ -55,7 +55,7 @@ func (h CallbackHandler) Handle(c echo.Context) error {
 		return c.JSON(http.StatusOK, r)
 	case viber.MessageEvent:
 		sendErr := h.getCarOwnerByTextCmd.Execute(r.Message.Text, r.Sender.ID, r.Message.TrackingData)
-		if updateErr := h.updateSubscriberCmd.Execute(&r.User, &r.Message.Contact); updateErr != nil {
+		if updateErr := h.updateSubscriberCmd.Execute(r.User, r.Message.Contact); updateErr != nil {
 			logrus.Error(updateErr)
 		}
 		if sendErr != nil {

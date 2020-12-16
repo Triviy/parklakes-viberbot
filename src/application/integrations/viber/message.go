@@ -11,22 +11,25 @@ const (
 	messageType = "text"
 )
 
+// MessageRequest is sent to Vibers Message API
 type MessageRequest struct {
 	//TODO: Move to headers
-	AuthToken    string  `json:"auth_token"`
-	Receiver     string  `json:"receiver"`
-	Type         string  `json:"type"`
-	Text         string  `json:"text,omitempty"`
-	TrackingData string  `json:"tracking_data,omitempty"`
-	Contact      Contact `json:"contact,omitempty"`
+	AuthToken    string   `json:"auth_token"`
+	Receiver     string   `json:"receiver"`
+	Type         string   `json:"type"`
+	Text         string   `json:"text,omitempty"`
+	TrackingData string   `json:"tracking_data,omitempty"`
+	Contact      *Contact `json:"contact,omitempty"`
 }
 
+// MessageResponse is returnned from Vibers Message API
 type MessageResponse struct {
 	Status        int    `json:"status"`
 	StatusMessage string `json:"status_message"`
 	ChatHostname  string `json:"chat_hostname"`
 }
 
+// SendMessage sends message to Vibers API
 func SendMessage(request *MessageRequest, viberBaseURL string) error {
 	apiURL := fmt.Sprintf("%s/pa/send_message", viberBaseURL)
 
