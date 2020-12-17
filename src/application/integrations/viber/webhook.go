@@ -2,7 +2,6 @@ package viber
 
 // SetWebhookRequest request for Vibers webhook API
 type SetWebhookRequest struct {
-	AuthToken  string   `json:"auth_token"`
 	URL        string   `json:"url"`
 	EventTypes []string `json:"event_types"`
 	SendName   bool     `json:"send_name"`

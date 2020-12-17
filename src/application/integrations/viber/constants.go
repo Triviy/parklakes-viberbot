@@ -1,8 +1,12 @@
 package viber
 
+import "github.com/triviy/parklakes-viberbot/application/integrations"
+
 // Viber constants
 const (
 	SuccessStatus = 0
+
+	APIKeyHeader = "X-Viber-Auth-Token"
 
 	DeliveredEvent           = "delivered"
 	SeenEvent                = "seen"
@@ -14,3 +18,8 @@ const (
 
 	TextType = "text"
 )
+
+// NewAuthHeader creates Viber auth header
+func NewAuthHeader(apiKey string) integrations.Header {
+	return integrations.Header{Name: APIKeyHeader, Value: apiKey}
+}

@@ -13,8 +13,6 @@ const (
 
 // MessageRequest is sent to Vibers Message API
 type MessageRequest struct {
-	//TODO: Move to headers
-	AuthToken    string   `json:"auth_token"`
 	Receiver     string   `json:"receiver"`
 	Type         string   `json:"type"`
 	Text         string   `json:"text,omitempty"`
@@ -30,11 +28,11 @@ type MessageResponse struct {
 }
 
 // SendMessage sends message to Vibers API
-func SendMessage(request *MessageRequest, viberBaseURL string) error {
+func SendMessage(request *MessageRequest, viberBaseURL string, apiKey string) error {
 	apiURL := fmt.Sprintf("%s/pa/send_message", viberBaseURL)
-
+	authHeader := NewAuthHeader(apiKey)
 	var response MessageResponse
-	if err := integrations.SendPostRequest(apiURL, &request, &response); err != nil {
+	if err := integrations.SendPostRequest(apiURL, &request, &response, authHeader); err != nil {
 		return err
 	}
 	if response.Status != SuccessStatus {

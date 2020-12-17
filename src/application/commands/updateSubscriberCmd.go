@@ -2,7 +2,6 @@ package commands
 
 import (
 	"github.com/pkg/errors"
-	"github.com/sirupsen/logrus"
 	"github.com/triviy/parklakes-viberbot/application/integrations/viber"
 	"github.com/triviy/parklakes-viberbot/domain/interfaces"
 	"github.com/triviy/parklakes-viberbot/domain/models"
@@ -28,7 +27,6 @@ func (cmd UpdateSubscriberCmd) Execute(user *viber.User, contact *viber.Contact)
 	}
 	var subPhones models.Subscriber
 	opts := options.FindOne().SetProjection(bson.M{"phoneNumbers": 1})
-	logrus.Info("executung cmd.subscriberRepo.FindOne")
 	if err := cmd.subscriberRepo.FindOne(user.ID, &subPhones, opts); err != nil {
 		if !errors.Is(err, mongo.ErrNoDocuments) {
 			return err
@@ -42,22 +40,15 @@ func (cmd UpdateSubscriberCmd) Execute(user *viber.User, contact *viber.Contact)
 		Active:  true,
 	}
 
-	logrus.Info("getting phoneNumbers")
 	if subPhones.PhoneNumbers != nil && len(subPhones.PhoneNumbers) > 0 {
 		copy(subPhones.PhoneNumbers, newSub.PhoneNumbers)
-		logrus.Info("copy phoneNumbers")
 	}
-	logrus.Info("checking contacts")
 	if contact != nil && len(contact.PhoneNumber) > 5 && !contains(newSub.PhoneNumbers, contact.PhoneNumber) {
 		newSub.PhoneNumbers = append(newSub.PhoneNumbers, contact.PhoneNumber)
 	}
-	logrus.Info("executing cmd.subscriberRepo.Upsert")
-	b, e := bson.Marshal(newSub)
-	logrus.Infof("try to bson them '%s' err --'%v'", string(b), e)
 	if err := cmd.subscriberRepo.Upsert(user.ID, newSub); err != nil {
 		return err
 	}
-	logrus.Info("returning")
 	return nil
 }
 

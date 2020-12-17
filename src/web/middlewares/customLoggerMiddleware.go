@@ -1,7 +1,9 @@
 package middlewares
 
 import (
+	"bytes"
 	"fmt"
+	"io/ioutil"
 	"strings"
 	"time"
 
@@ -18,37 +20,16 @@ type stackTracer interface {
 func CustomLogger() echo.MiddlewareFunc {
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(ctx echo.Context) (err error) {
-			req := ctx.Request()
-			res := ctx.Response()
-			log.WithField("details", requestLogEntry{
-				Method:        req.Method,
-				URI:           req.RequestURI,
-				Path:          req.URL.Path,
-				RemoteIP:      ctx.RealIP(),
-				Host:          req.Host,
-				Protocol:      req.Proto,
-				Referer:       req.Referer(),
-				UserAgent:     req.UserAgent(),
-				RequestID:     req.Header.Get(echo.HeaderXRequestID),
-				ContentLength: req.ContentLength,
-			}).Info("-- Start request")
+			logRequest(ctx)
 
 			start := time.Now()
 			if err = next(ctx); err != nil {
 				ctx.Error(err)
 			}
 			stop := time.Now()
-			// add some default fields to the logger ~ on all messages
-			log.WithField("details", responseLogEntry{
-				Method:     req.Method,
-				URI:        req.RequestURI,
-				Path:       req.URL.Path,
-				StatusCode: res.Status,
-				Error:      getErrorText(err),
-				RequestID:  res.Header().Get(echo.HeaderXRequestID),
-				StackTrace: getStackTrace(err),
-				Latency:    stop.Sub(start).String(),
-			}).Info("-- End request")
+
+			logResponse(ctx, err, stop.Sub(start))
+
 			return nil
 		}
 	}
@@ -64,6 +45,7 @@ type requestLogEntry struct {
 	Referer       string `json:"referer"`
 	UserAgent     string `json:"userAgent"`
 	RequestID     string `json:"requestId"`
+	Body          string `json:"body"`
 	ContentLength int64  `json:"contentLength"`
 }
 
@@ -76,6 +58,50 @@ type responseLogEntry struct {
 	RequestID  string `json:"requestId"`
 	Latency    string `json:"latency"`
 	StackTrace string `json:"stackTrace"`
+}
+
+func logRequest(ctx echo.Context) {
+	req := ctx.Request()
+	var body string
+	b, err := ioutil.ReadAll(req.Body)
+	if err != nil {
+		log.Error(errors.Wrap(err, "reading from request body failed"))
+	} else {
+		body = string(b)
+	}
+	defer func() {
+		req.Body.Close()
+		req.Body = ioutil.NopCloser(bytes.NewBuffer(b))
+	}()
+
+	log.WithField("details", requestLogEntry{
+		Method:        req.Method,
+		URI:           req.RequestURI,
+		Path:          req.URL.Path,
+		RemoteIP:      ctx.RealIP(),
+		Host:          req.Host,
+		Protocol:      req.Proto,
+		Referer:       req.Referer(),
+		UserAgent:     req.UserAgent(),
+		RequestID:     req.Header.Get(echo.HeaderXRequestID),
+		Body:          body,
+		ContentLength: req.ContentLength,
+	}).Info("-- Start request")
+}
+
+func logResponse(ctx echo.Context, err error, latency time.Duration) {
+	req := ctx.Request()
+	res := ctx.Response()
+	log.WithField("details", responseLogEntry{
+		Method:     req.Method,
+		URI:        req.RequestURI,
+		Path:       req.URL.Path,
+		StatusCode: res.Status,
+		Error:      getErrorText(err),
+		RequestID:  res.Header().Get(echo.HeaderXRequestID),
+		StackTrace: getStackTrace(err),
+		Latency:    latency.String(),
+	}).Info("-- End request")
 }
 
 func getErrorText(err error) string {

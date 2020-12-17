@@ -34,14 +34,13 @@ func (cmd GetCarOwnerByTextCmd) Execute(cm *viber.CallbackMessage, userID string
 	}
 
 	request := viber.MessageRequest{
-		AuthToken:    cmd.config.GetViberAPIKey(),
 		Receiver:     userID,
 		Type:         viber.TextType,
 		Text:         text,
 		TrackingData: cm.TrackingData,
 	}
 
-	return viber.SendMessage(&request, cmd.config.GetViberBaseURL())
+	return viber.SendMessage(&request, cmd.config.GetViberBaseURL(), cmd.config.GetViberAPIKey())
 }
 
 func (cmd GetCarOwnerByTextCmd) getUsersResponseByText(input string) (text string, err error) {

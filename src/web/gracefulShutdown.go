@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"github.com/labstack/echo"
-	"github.com/labstack/gommon/log"
+	log "github.com/sirupsen/logrus"
 	"github.com/triviy/parklakes-viberbot/infrastructure/persistance"
 )
 

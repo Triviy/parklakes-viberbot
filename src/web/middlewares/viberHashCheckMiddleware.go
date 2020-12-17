@@ -9,7 +9,6 @@ import (
 
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
-	"github.com/labstack/gommon/log"
 	"github.com/pkg/errors"
 )
 
@@ -23,7 +22,6 @@ func ViberHashCheck(apiKey string) echo.MiddlewareFunc {
 			b, err := ioutil.ReadAll(req.Body)
 			defer func() {
 				req.Body.Close()
-				log.Info(string(b))
 				req.Body = ioutil.NopCloser(bytes.NewBuffer(b))
 			}()
 
