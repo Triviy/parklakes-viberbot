@@ -64,5 +64,5 @@ func (cmd GetCarOwnerByTextCmd) getUsersResponseByText(input string) (text strin
 	if len(co.Phones) > 1 {
 		sb.WriteString(fmt.Sprintf("\nДодатковый: %s", co.Phones[1]))
 	}
-	return text, nil
+	return sb.String(), nil
 }
