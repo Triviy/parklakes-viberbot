@@ -41,7 +41,7 @@ func (r ImageTextReader) BatchReadFileRemoteImage(imageURL string) ([]string, er
 	}
 	operationLocation := autorest.ExtractHeaderValue("Operation-Location", textHeaders.Response)
 
-	operationID := string(operationLocation[len(operationLocation)-numberOfCharsInoperationID : len(operationLocation)])
+	operationID := string(operationLocation[len(operationLocation)-numberOfCharsInoperationID])
 
 	readOperationResult, err := r.client.GetReadOperationResult(r.ctx, operationID)
 	if err != nil {
