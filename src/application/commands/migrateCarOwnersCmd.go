@@ -90,14 +90,15 @@ func prepareCarOwnersForSave(lastMigrationTime time.Time, data [][]interface{}) 
 }
 
 func createCarOwnerFromRecord(record []interface{}) (co *models.CarOwner, err error) {
-	carNumber := strings.TrimSpace(record[1].(string))
-	if carNumber == "" {
+	carNumberString := strings.TrimSpace(record[1].(string))
+	if carNumberString == "" {
 		err = errors.New("Car number is empty")
 		return
 	}
+	id, _ := models.ToCarNumber(carNumberString)
 	carOwner := models.CarOwner{
-		ID:        models.NormalizeCarNumber(carNumber),
-		CarNumber: carNumber,
+		ID:        id,
+		CarNumber: carNumberString,
 		Created:   record[0].(string),
 		Owner:     record[2].(string),
 	}

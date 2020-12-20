@@ -36,12 +36,12 @@ var replacer = strings.NewReplacer(
 )
 var standardNumberRegexp = regexp.MustCompile(`[A-Z]{2}[0-9]{4}[A-Z]{2}|[0-9]{5}[A-Z,А-Я,І]{2}|[A-Z]{3}[0-9]{3}`)
 
-// NormalizeCarNumber returns searchable car number string
-func NormalizeCarNumber(cn string) string {
+// ToCarNumber returns searchable car number string
+func ToCarNumber(cn string) (string, bool) {
 	cn = strings.ToUpper(cn)
 	cn = replacer.Replace(cn)
 	if matchedCn := standardNumberRegexp.FindString(cn); matchedCn != "" {
-		return matchedCn
+		return matchedCn, true
 	}
-	return cn
+	return cn, false
 }

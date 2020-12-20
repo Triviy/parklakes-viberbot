@@ -30,14 +30,14 @@ func NewImageTextReader(ctx context.Context, apiKey string, apiURL string) *Imag
 }
 
 // BatchReadFileRemoteImage reads text from image
-func (r ImageTextReader) BatchReadFileRemoteImage(imageURL string) error {
+func (r ImageTextReader) BatchReadFileRemoteImage(imageURL string) ([]string, error) {
 	log.Info("BATCH READ FILE - remote")
 	var remoteImage computervision.ImageURL
 	remoteImage.URL = &imageURL
 
 	textHeaders, err := r.client.BatchReadFile(r.ctx, remoteImage)
 	if err != nil {
-		return errors.Wrap(err, "batch file reading failed")
+		return nil, errors.Wrap(err, "batch file reading failed")
 	}
 	operationLocation := autorest.ExtractHeaderValue("Operation-Location", textHeaders.Response)
 
@@ -45,7 +45,7 @@ func (r ImageTextReader) BatchReadFileRemoteImage(imageURL string) error {
 
 	readOperationResult, err := r.client.GetReadOperationResult(r.ctx, operationID)
 	if err != nil {
-		return errors.Wrap(err, "getting read operation results failed")
+		return nil, errors.Wrap(err, "getting read operation results failed")
 	}
 
 	i := 0
@@ -63,13 +63,14 @@ func (r ImageTextReader) BatchReadFileRemoteImage(imageURL string) error {
 
 		readOperationResult, err = r.client.GetReadOperationResult(r.ctx, operationID)
 		if err != nil {
-			return errors.Wrap(err, "getting read operation results failed")
+			return nil, errors.Wrap(err, "getting read operation results failed")
 		}
 	}
+	var results []string
 	for _, recResult := range *(readOperationResult.RecognitionResults) {
 		for _, line := range *recResult.Lines {
-			log.Warn(*line.Text)
+			results = append(results, *line.Text)
 		}
 	}
-	return nil
+	return results, nil
 }
