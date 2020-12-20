@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/triviy/parklakes-viberbot/application/commands"
+	computervision "github.com/triviy/parklakes-viberbot/application/integrations/computer-vision"
 	"github.com/triviy/parklakes-viberbot/application/integrations/google"
 	"github.com/triviy/parklakes-viberbot/infrastructure/persistance"
 	"github.com/triviy/parklakes-viberbot/web/config"
@@ -32,15 +33,17 @@ func InitializeHandlers(ctx context.Context, cfg *config.APIConfig) (h *Handlers
 	if err != nil {
 		return
 	}
+	imageTextReader := computervision.NewImageTextReader(ctx, cfg.GetComputerVisionAPIKey(), cfg.GetComputerVisionAPIUrl())
 
 	migrateCarOwnerCmd := commands.NewMigrateCarOwnersCmd(carOwnersRepo, carOwnerPropsRepo, gSpreadsheet)
 	migrateCarOwnerHandler := NewMigrateCarOwnersHandler(migrateCarOwnerCmd)
 
 	getCarOwnerByTextCmd := commands.NewGetCarOwnerByTextCmd(cfg, carOwnersRepo)
+	getCarOwnerByImageCmd := commands.NewGetCarOwnerByImageCmd(cfg, carOwnersRepo, imageTextReader)
 	updateSubscriberCmd := commands.NewUpdateSubscriberCmd(subscribersRepo)
 	unsubscribeCmd := commands.NewUnsubscribeCmd(subscribersRepo)
 	welcomeCmd := commands.NewWelcomeCmd()
-	callbackHandler := NewCallbackHandler(getCarOwnerByTextCmd, updateSubscriberCmd, unsubscribeCmd, welcomeCmd)
+	callbackHandler := NewCallbackHandler(getCarOwnerByTextCmd, getCarOwnerByImageCmd, updateSubscriberCmd, unsubscribeCmd, welcomeCmd)
 
 	setWebhookCmd := commands.NewSetWebhookCmd(cfg)
 	setWebhookHandler := NewSetWebhookHandler(setWebhookCmd)

@@ -12,21 +12,24 @@ import (
 
 // CallbackHandler handles set webhook request
 type CallbackHandler struct {
-	getCarOwnerByTextCmd *commands.GetCarOwnerByTextCmd
-	updateSubscriberCmd  *commands.UpdateSubscriberCmd
-	unsubscribeCmd       *commands.UnsubscribeCmd
-	welcomeCmd           *commands.WelcomeCmd
+	getCarOwnerByTextCmd  *commands.GetCarOwnerByTextCmd
+	getCarOwnerByImageCmd *commands.GetCarOwnerByImageCmd
+	updateSubscriberCmd   *commands.UpdateSubscriberCmd
+	unsubscribeCmd        *commands.UnsubscribeCmd
+	welcomeCmd            *commands.WelcomeCmd
 }
 
 // NewCallbackHandler creates new handler instance
 func NewCallbackHandler(
 	getCarOwnerByTextCmd *commands.GetCarOwnerByTextCmd,
+	getCarOwnerByImageCmd *commands.GetCarOwnerByImageCmd,
 	updateSubscriberCmd *commands.UpdateSubscriberCmd,
 	unsubscribeCmd *commands.UnsubscribeCmd,
 	welcomeCmd *commands.WelcomeCmd,
 ) *CallbackHandler {
 	return &CallbackHandler{
 		getCarOwnerByTextCmd,
+		getCarOwnerByImageCmd,
 		updateSubscriberCmd,
 		unsubscribeCmd,
 		welcomeCmd,
@@ -52,7 +55,11 @@ func (h CallbackHandler) Handle(c echo.Context) error {
 		r := h.welcomeCmd.Execute()
 		return c.JSON(http.StatusOK, r)
 	case viber.MessageEvent:
-		sendErr := h.getCarOwnerByTextCmd.Execute(r.Message, r.Sender.ID)
+		var sendErr error
+		if r.Type == viber.PictureType {
+			sendErr = h.getCarOwnerByImageCmd.Execute(r.Message, r.Sender.ID)
+		}
+		sendErr = h.getCarOwnerByTextCmd.Execute(r.Message, r.Sender.ID)
 		if updateErr := h.updateSubscriberCmd.Execute(r.Sender, r.Message.Contact); updateErr != nil {
 			log.Error(updateErr)
 		}

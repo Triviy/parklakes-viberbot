@@ -22,6 +22,10 @@ type apiConfig struct {
 		SpreadsheetID string `yaml:"spreadsheetID" env:"SHEETS_SPREADSHEET_ID" env-required:"true"`
 		APIKey        string `yaml:"apiKey" env:"SHEETS_API_KEY" env-required:"true"`
 	} `yaml:"sheetsAPI"`
+	ComputerVision struct {
+		APIKey string `yaml:"apiKey" env:"COMPUTER_VISION_API_KEY" env-required:"true"`
+		APIUrl string `yaml:"apiURL" env:"COMPUTER_VISION_API_URL" env-required:"true"`
+	} `yaml:"computerVision"`
 }
 
 // APIConfig ...
@@ -89,4 +93,14 @@ func (c APIConfig) GetSheetsAPISpreadsheetID() string {
 // GetSheetsAPIKey returns APIKey with scoped access to Google SpreadSheet
 func (c APIConfig) GetSheetsAPIKey() string {
 	return c.cfg.SheetsAPI.APIKey
+}
+
+// GetComputerVisionAPIKey returns APIKey for Computer Vision API
+func (c APIConfig) GetComputerVisionAPIKey() string {
+	return c.cfg.ComputerVision.APIKey
+}
+
+// GetComputerVisionAPIUrl returns URL for Computer Vision API
+func (c APIConfig) GetComputerVisionAPIUrl() string {
+	return c.cfg.ComputerVision.APIUrl
 }

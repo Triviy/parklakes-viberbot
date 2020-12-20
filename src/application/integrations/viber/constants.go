@@ -16,7 +16,8 @@ const (
 	ConversationStartedEvent = "conversation_started"
 	MessageEvent             = "message"
 
-	TextType = "text"
+	TextType    = "text"
+	PictureType = "picture"
 )
 
 // NewAuthHeader creates Viber auth header
