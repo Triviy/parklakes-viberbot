@@ -4,12 +4,17 @@ import (
 	"fmt"
 
 	"github.com/pkg/errors"
+	log "github.com/sirupsen/logrus"
 	computervision "github.com/triviy/parklakes-viberbot/application/integrations/computer-vision"
 	"github.com/triviy/parklakes-viberbot/application/integrations/viber"
 	"github.com/triviy/parklakes-viberbot/domain/interfaces"
 	"github.com/triviy/parklakes-viberbot/domain/models"
 	"github.com/triviy/parklakes-viberbot/web/config"
 	"go.mongodb.org/mongo-driver/mongo"
+)
+
+const (
+	imageCmdErrorText = "Вибачте, виникла технічна помилка 😢 Спробуйте відправити номер текстом"
 )
 
 // GetCarOwnerByImageCmd instance of viber webhook cmd
@@ -29,13 +34,18 @@ func (cmd GetCarOwnerByImageCmd) Execute(cm *viber.CallbackMessage, userID strin
 	if cm == nil {
 		return errors.New("viber.CallbackMessage is nil")
 	}
+	var text string
+
 	r, err := cmd.imageTextReader.BatchReadFileRemoteImage(cm.Media)
 	if err != nil {
-		return err
-	}
-	text, err := cmd.getUserResponse(r)
-	if err != nil {
-		return err
+		log.Error(err)
+		text = imageCmdErrorText
+	} else {
+		text, err = cmd.getUserResponse(r)
+		if err != nil {
+			log.Error(err)
+			text = imageCmdErrorText
+		}
 	}
 
 	request := viber.MessageRequest{

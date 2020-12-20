@@ -2,6 +2,7 @@ package commands
 
 import (
 	"github.com/pkg/errors"
+	log "github.com/sirupsen/logrus"
 	"github.com/triviy/parklakes-viberbot/application/integrations/viber"
 	"github.com/triviy/parklakes-viberbot/domain/interfaces"
 	"github.com/triviy/parklakes-viberbot/domain/models"
@@ -27,7 +28,8 @@ func (cmd GetCarOwnerByTextCmd) Execute(cm *viber.CallbackMessage, userID string
 	}
 	text, err := cmd.getUserResponse(cm.Text)
 	if err != nil {
-		return err
+		log.Error(err)
+		text = "Вибачте, виникла технічна помилка 😢 Спробуйте ще раз"
 	}
 
 	request := viber.MessageRequest{
