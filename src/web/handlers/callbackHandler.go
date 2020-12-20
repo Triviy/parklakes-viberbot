@@ -56,7 +56,7 @@ func (h CallbackHandler) Handle(c echo.Context) error {
 		return c.JSON(http.StatusOK, r)
 	case viber.MessageEvent:
 		var sendErr error
-		if r.Type == viber.PictureType {
+		if r.Message.Type == viber.PictureType {
 			sendErr = h.getCarOwnerByImageCmd.Execute(r.Message, r.Sender.ID)
 		}
 		sendErr = h.getCarOwnerByTextCmd.Execute(r.Message, r.Sender.ID)

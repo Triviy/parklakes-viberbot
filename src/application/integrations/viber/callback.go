@@ -2,16 +2,16 @@ package viber
 
 // Callback is Viber full callback contract
 type Callback struct {
-	Event        string           `json:"event"`
-	Timestamp    int64            `json:"timestamp"`
-	MessageToken int64            `json:"message_token"`
-	UserID       string           `json:"user_id,omitempty"`
-	Type         string           `json:"type,omitempty"`
-	Context      string           `json:"context,omitempty"`
-	Subscribed   bool             `json:"subscribed,omitempty"`
-	Sender       *User            `json:"sender,omitempty"`
-	User         *User            `json:"user,omitempty"`
-	Message      *CallbackMessage `json:"message,omitempty"`
+	Event                   string           `json:"event"`
+	Timestamp               int64            `json:"timestamp"`
+	MessageToken            int64            `json:"message_token"`
+	UserID                  string           `json:"user_id,omitempty"`
+	ConversationStartedType string           `json:"type,omitempty"`
+	Context                 string           `json:"context,omitempty"`
+	Subscribed              bool             `json:"subscribed,omitempty"`
+	Sender                  *User            `json:"sender,omitempty"`
+	User                    *User            `json:"user,omitempty"`
+	Message                 *CallbackMessage `json:"message,omitempty"`
 }
 
 // User is Viber full users contract
