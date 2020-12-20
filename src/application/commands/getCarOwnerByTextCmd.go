@@ -5,8 +5,8 @@ import (
 	"github.com/triviy/parklakes-viberbot/application/integrations/viber"
 	"github.com/triviy/parklakes-viberbot/domain/interfaces"
 	"github.com/triviy/parklakes-viberbot/domain/models"
-	"github.com/triviy/parklakes-viberbot/domain/services"
 	"github.com/triviy/parklakes-viberbot/web/config"
+	"go.mongodb.org/mongo-driver/mongo"
 )
 
 // GetCarOwnerByTextCmd instance of viber webhook cmd
@@ -45,5 +45,12 @@ func (cmd GetCarOwnerByTextCmd) getUserResponse(input string) (text string, err 
 	if len(carNumber) < 3 || len(carNumber) > 16 {
 		return "Вибачте, отриманий номер автівки замалий або завеликий. Спробуйте ще 😉", nil
 	}
-	return services.GetUsersResponseByCarNumber(cmd.carOwnersRepo, carNumber)
+	var co models.CarOwner
+	if err := cmd.carOwnersRepo.FindOne(carNumber, &co); err != nil {
+		if errors.Is(err, mongo.ErrNoDocuments) {
+			return "Вибачте, мені не вдалося знайти автівки з таким номером 😥", nil
+		}
+		return "", err
+	}
+	return co.ToBotResponse(), nil
 }

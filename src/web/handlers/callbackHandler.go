@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/labstack/echo"
+	"github.com/patrickmn/go-cache"
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 	"github.com/triviy/parklakes-viberbot/application/commands"
@@ -17,6 +18,7 @@ type CallbackHandler struct {
 	updateSubscriberCmd   *commands.UpdateSubscriberCmd
 	unsubscribeCmd        *commands.UnsubscribeCmd
 	welcomeCmd            *commands.WelcomeCmd
+	inMemoryCache         *cache.Cache
 }
 
 // NewCallbackHandler creates new handler instance
@@ -26,6 +28,7 @@ func NewCallbackHandler(
 	updateSubscriberCmd *commands.UpdateSubscriberCmd,
 	unsubscribeCmd *commands.UnsubscribeCmd,
 	welcomeCmd *commands.WelcomeCmd,
+	inMemoryCache *cache.Cache,
 ) *CallbackHandler {
 	return &CallbackHandler{
 		getCarOwnerByTextCmd,
@@ -33,6 +36,7 @@ func NewCallbackHandler(
 		updateSubscriberCmd,
 		unsubscribeCmd,
 		welcomeCmd,
+		inMemoryCache,
 	}
 }
 
@@ -42,6 +46,11 @@ func (h CallbackHandler) Handle(c echo.Context) error {
 	if err := c.Bind(&r); err != nil {
 		return errors.Wrap(err, "binding of callback failed")
 	}
+	if _, ok := h.inMemoryCache.Get(string(r.MessageToken)); ok {
+		return c.JSON(http.StatusOK, createOkResponse())
+	}
+
+	var res interface{} = createOkResponse()
 	switch r.Event {
 	case viber.SubscribedEvent:
 		if err := h.updateSubscriberCmd.Execute(r.User, nil); err != nil {
@@ -52,8 +61,7 @@ func (h CallbackHandler) Handle(c echo.Context) error {
 			return err
 		}
 	case viber.ConversationStartedEvent:
-		r := h.welcomeCmd.Execute()
-		return c.JSON(http.StatusOK, r)
+		res = h.welcomeCmd.Execute()
 	case viber.MessageEvent:
 		var sendErr error
 		if r.Message.Type == viber.PictureType {
@@ -68,5 +76,7 @@ func (h CallbackHandler) Handle(c echo.Context) error {
 			return sendErr
 		}
 	}
-	return c.JSON(http.StatusOK, createOkResponse())
+
+	h.inMemoryCache.SetDefault(string(r.MessageToken), true)
+	return c.JSON(http.StatusOK, res)
 }

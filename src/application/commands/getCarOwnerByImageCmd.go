@@ -1,13 +1,15 @@
 package commands
 
 import (
+	"fmt"
+
 	"github.com/pkg/errors"
 	computervision "github.com/triviy/parklakes-viberbot/application/integrations/computer-vision"
 	"github.com/triviy/parklakes-viberbot/application/integrations/viber"
 	"github.com/triviy/parklakes-viberbot/domain/interfaces"
 	"github.com/triviy/parklakes-viberbot/domain/models"
-	"github.com/triviy/parklakes-viberbot/domain/services"
 	"github.com/triviy/parklakes-viberbot/web/config"
+	"go.mongodb.org/mongo-driver/mongo"
 )
 
 // GetCarOwnerByImageCmd instance of viber webhook cmd
@@ -57,5 +59,12 @@ func (cmd GetCarOwnerByImageCmd) getUserResponse(input []string) (text string, e
 	if carNumber == "" {
 		return "Вибачте, не вдалось розпізнати номера автівки по фото. Спробуйте ще 😉", nil
 	}
-	return services.GetUsersResponseByCarNumber(cmd.carOwnersRepo, carNumber)
+	var co models.CarOwner
+	if err := cmd.carOwnersRepo.FindOne(carNumber, &co); err != nil {
+		if errors.Is(err, mongo.ErrNoDocuments) {
+			return fmt.Sprintf("Вибачте, мені не вдалося знайти автівки з номером %s 😥", carNumber), nil
+		}
+		return "", err
+	}
+	return co.ToBotResponse(), nil
 }

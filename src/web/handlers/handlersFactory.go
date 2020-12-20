@@ -2,7 +2,9 @@ package handlers
 
 import (
 	"context"
+	"time"
 
+	"github.com/patrickmn/go-cache"
 	"github.com/triviy/parklakes-viberbot/application/commands"
 	computervision "github.com/triviy/parklakes-viberbot/application/integrations/computer-vision"
 	"github.com/triviy/parklakes-viberbot/application/integrations/google"
@@ -43,7 +45,8 @@ func InitializeHandlers(ctx context.Context, cfg *config.APIConfig) (h *Handlers
 	updateSubscriberCmd := commands.NewUpdateSubscriberCmd(subscribersRepo)
 	unsubscribeCmd := commands.NewUnsubscribeCmd(subscribersRepo)
 	welcomeCmd := commands.NewWelcomeCmd()
-	callbackHandler := NewCallbackHandler(getCarOwnerByTextCmd, getCarOwnerByImageCmd, updateSubscriberCmd, unsubscribeCmd, welcomeCmd)
+	inMemoryCache := cache.New(2*time.Minute, 5*time.Minute)
+	callbackHandler := NewCallbackHandler(getCarOwnerByTextCmd, getCarOwnerByImageCmd, updateSubscriberCmd, unsubscribeCmd, welcomeCmd, inMemoryCache)
 
 	setWebhookCmd := commands.NewSetWebhookCmd(cfg)
 	setWebhookHandler := NewSetWebhookHandler(setWebhookCmd)

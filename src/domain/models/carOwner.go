@@ -1,6 +1,7 @@
 package models
 
 import (
+	"fmt"
 	"regexp"
 	"strings"
 )
@@ -44,4 +45,19 @@ func ToCarNumber(cn string) (string, bool) {
 		return matchedCn, true
 	}
 	return cn, false
+}
+
+// ToBotResponse retruns text that describes search results
+func (co CarOwner) ToBotResponse() string {
+	var sb strings.Builder
+	sb.WriteString("Я знайшов ☺️")
+	sb.WriteString(fmt.Sprintf("\nНомер авто: %s", co.ID))
+	if co.Owner != "" {
+		sb.WriteString(fmt.Sprintf("\nІм'я контакта: %s", co.Owner))
+	}
+	sb.WriteString(fmt.Sprintf("\nНомер телефону: %s", co.Phones[0]))
+	if len(co.Phones) > 1 {
+		sb.WriteString(fmt.Sprintf("\nДодатковый: %s", co.Phones[1]))
+	}
+	return sb.String()
 }

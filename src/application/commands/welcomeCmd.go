@@ -19,6 +19,6 @@ func NewWelcomeCmd() *WelcomeCmd {
 func (cmd WelcomeCmd) Execute() *viber.WelcomeResponse {
 	return &viber.WelcomeResponse{
 		Type: viber.TextType,
-		Text: "Вітаю! Введіть повний номер автівки, а я спробую вам допомогти",
+		Text: "Вітаю! Введіть повний номер або відправте фото автівки з номером, а я спробую вам допомогти",
 	}
 }
