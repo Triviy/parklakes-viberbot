@@ -2,7 +2,6 @@ package computervision
 
 import (
 	"context"
-	"fmt"
 	"time"
 
 	"github.com/Azure/azure-sdk-for-go/services/cognitiveservices/v2.0/computervision"
@@ -31,7 +30,6 @@ func NewImageTextReader(ctx context.Context, apiKey string, apiURL string) *Imag
 
 // BatchReadFileRemoteImage reads text from image
 func (r ImageTextReader) BatchReadFileRemoteImage(imageURL string) ([]string, error) {
-	log.Info("BATCH READ FILE - remote")
 	var remoteImage computervision.ImageURL
 	remoteImage.URL = &imageURL
 
@@ -41,7 +39,7 @@ func (r ImageTextReader) BatchReadFileRemoteImage(imageURL string) ([]string, er
 	}
 	operationLocation := autorest.ExtractHeaderValue("Operation-Location", textHeaders.Response)
 
-	operationID := string(operationLocation[len(operationLocation)-numberOfCharsInoperationID])
+	operationID := string(operationLocation[len(operationLocation)-numberOfCharsInoperationID:])
 
 	readOperationResult, err := r.client.GetReadOperationResult(r.ctx, operationID)
 	if err != nil {
@@ -50,7 +48,6 @@ func (r ImageTextReader) BatchReadFileRemoteImage(imageURL string) ([]string, er
 
 	i := 0
 
-	fmt.Println("Recognizing text in a remote image with the batch Read API ...")
 	for readOperationResult.Status != computervision.Failed &&
 		readOperationResult.Status != computervision.Succeeded {
 		if i >= maxRetries {
@@ -66,11 +63,13 @@ func (r ImageTextReader) BatchReadFileRemoteImage(imageURL string) ([]string, er
 			return nil, errors.Wrap(err, "getting read operation results failed")
 		}
 	}
+
 	var results []string
 	for _, recResult := range *(readOperationResult.RecognitionResults) {
 		for _, line := range *recResult.Lines {
 			results = append(results, *line.Text)
 		}
 	}
+	log.Infof("Computer Vision results for image %s are %v", imageURL, results)
 	return results, nil
 }
