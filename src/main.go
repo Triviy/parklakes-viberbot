@@ -20,13 +20,13 @@ var (
 )
 
 func init() {
-	cfg, err := config.NewAPIConfig()
+	c, err := config.NewAPIConfig()
 	if err != nil {
 		log.Fatal(err)
 		return
 	}
-
-	logging.InitLog(cfg.GetAppInsightsInstrumentationKey())
+	logging.InitLog(c.GetAppInsightsInstrumentationKey())
+	cfg = c
 }
 
 func main() {
