@@ -26,6 +26,9 @@ type apiConfig struct {
 		APIKey string `yaml:"apiKey" env:"COMPUTER_VISION_API_KEY" env-required:"true"`
 		APIUrl string `yaml:"apiURL" env:"COMPUTER_VISION_API_URL" env-required:"true"`
 	} `yaml:"computerVision"`
+	AppInsights struct {
+		InstrumentationKey string `yaml:"instrumentationKey" env:"APPINSIGHTS_INSTRUMENTATION_KEY" env-required:"true"`
+	} `yaml:"appInsights"`
 }
 
 // APIConfig ...
@@ -103,4 +106,9 @@ func (c APIConfig) GetComputerVisionAPIKey() string {
 // GetComputerVisionAPIUrl returns URL for Computer Vision API
 func (c APIConfig) GetComputerVisionAPIUrl() string {
 	return c.cfg.ComputerVision.APIUrl
+}
+
+// GetAppInsightsInstrumentationKey returns InstrumentationKey for AppInsights
+func (c APIConfig) GetAppInsightsInstrumentationKey() string {
+	return c.cfg.AppInsights.InstrumentationKey
 }

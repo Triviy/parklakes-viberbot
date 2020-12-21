@@ -3,34 +3,36 @@ package main
 import (
 	"context"
 	"fmt"
-	"os"
-	"time"
 
 	log "github.com/sirupsen/logrus"
 
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
+	"github.com/triviy/parklakes-viberbot/infrastructure/logging"
 	"github.com/triviy/parklakes-viberbot/web"
 	"github.com/triviy/parklakes-viberbot/web/config"
 	"github.com/triviy/parklakes-viberbot/web/handlers"
 	"github.com/triviy/parklakes-viberbot/web/middlewares"
 )
 
-func main() {
-	log.SetFormatter(&log.TextFormatter{
-		TimestampFormat: time.RFC3339Nano,
-	})
-	log.SetOutput(os.Stdout)
-	log.Info("Starting main")
+var (
+	cfg *config.APIConfig
+)
 
-	ctx := context.Background()
+func init() {
 	cfg, err := config.NewAPIConfig()
 	if err != nil {
 		log.Fatal(err)
 		return
 	}
 
-	h, err := handlers.InitializeHandlers(ctx, cfg)
+	logging.InitLog(cfg.GetAppInsightsInstrumentationKey())
+}
+
+func main() {
+	log.Info("Starting main")
+
+	h, err := handlers.InitializeHandlers(context.Background(), cfg)
 	if err != nil {
 		log.Fatal(err)
 		return
