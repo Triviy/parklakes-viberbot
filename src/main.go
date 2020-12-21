@@ -3,13 +3,10 @@ package main
 import (
 	"context"
 	"fmt"
-	"os"
-	"time"
-
-	log "github.com/sirupsen/logrus"
 
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
+	"github.com/triviy/parklakes-viberbot/infrastructure/logger"
 	"github.com/triviy/parklakes-viberbot/web"
 	"github.com/triviy/parklakes-viberbot/web/config"
 	"github.com/triviy/parklakes-viberbot/web/handlers"
@@ -17,22 +14,19 @@ import (
 )
 
 func main() {
-	log.SetFormatter(&log.TextFormatter{
-		TimestampFormat: time.RFC3339Nano,
-	})
-	log.SetOutput(os.Stdout)
-	log.Info("Starting main")
+
+	logger.Info("Starting main")
 
 	ctx := context.Background()
 	cfg, err := config.NewAPIConfig()
 	if err != nil {
-		log.Fatal(err)
+		logger.Fatal(err)
 		return
 	}
 
 	h, err := handlers.InitializeHandlers(ctx, cfg)
 	if err != nil {
-		log.Fatal(err)
+		logger.Fatal(err)
 		return
 	}
 

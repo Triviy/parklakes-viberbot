@@ -7,14 +7,14 @@ import (
 	"time"
 
 	"github.com/labstack/echo"
-	log "github.com/sirupsen/logrus"
+	"github.com/triviy/parklakes-viberbot/infrastructure/logger"
 	"github.com/triviy/parklakes-viberbot/infrastructure/persistance"
 )
 
 // GracefulShutdown Wait for interrupt signal
 // to gracefully shutdown the server with a timeout of 5 seconds.
 func GracefulShutdown(e *echo.Echo, err error) {
-	log.Error(err)
+	logger.Error(err)
 
 	quit := make(chan os.Signal, 1)
 
@@ -25,10 +25,10 @@ func GracefulShutdown(e *echo.Echo, err error) {
 	if datastore := persistance.GetDatastore(); datastore != nil {
 		err := datastore.Disconnect()
 		if err != nil {
-			log.Error(err)
+			logger.Error(err)
 		}
 	}
 	if err := e.Shutdown(ctx); err != nil {
-		log.Fatal(err)
+		logger.Fatal(err)
 	}
 }

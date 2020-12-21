@@ -7,7 +7,7 @@ import (
 	"github.com/Azure/azure-sdk-for-go/services/cognitiveservices/v2.0/computervision"
 	"github.com/Azure/go-autorest/autorest"
 	"github.com/pkg/errors"
-	log "github.com/sirupsen/logrus"
+	"github.com/triviy/parklakes-viberbot/infrastructure/logger"
 )
 
 const (
@@ -55,7 +55,7 @@ func (r ImageTextReader) BatchReadFileRemoteImage(imageURL string) ([]string, er
 		}
 		i++
 
-		log.Info("Server status: %v, waiting %v seconds...\n", readOperationResult.Status, i)
+		logger.Info("Server status: %v, waiting %v seconds...\n", readOperationResult.Status, i)
 		time.Sleep(1 * time.Second)
 
 		readOperationResult, err = r.client.GetReadOperationResult(r.ctx, operationID)
@@ -70,6 +70,6 @@ func (r ImageTextReader) BatchReadFileRemoteImage(imageURL string) ([]string, er
 			results = append(results, *line.Text)
 		}
 	}
-	log.Infof("Computer Vision results for image %s are %v", imageURL, results)
+	logger.Infof("Computer Vision results for image %s are %v", imageURL, results)
 	return results, nil
 }

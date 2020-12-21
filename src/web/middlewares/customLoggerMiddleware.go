@@ -9,7 +9,7 @@ import (
 
 	"github.com/labstack/echo"
 	"github.com/pkg/errors"
-	log "github.com/sirupsen/logrus"
+	"github.com/triviy/parklakes-viberbot/infrastructure/logger"
 )
 
 type stackTracer interface {
@@ -35,37 +35,12 @@ func CustomLogger() echo.MiddlewareFunc {
 	}
 }
 
-type requestLogEntry struct {
-	Method        string `json:"method"`
-	URI           string `json:"uri"`
-	Path          string `json:"path"`
-	RemoteIP      string `json:"remoteIp"`
-	Host          string `json:"host"`
-	Protocol      string `json:"protocol"`
-	Referer       string `json:"referer"`
-	UserAgent     string `json:"userAgent"`
-	RequestID     string `json:"requestId"`
-	Body          string `json:"body"`
-	ContentLength int64  `json:"contentLength"`
-}
-
-type responseLogEntry struct {
-	StatusCode int    `json:"statusCode"`
-	Error      string `json:"error"`
-	Method     string `json:"method"`
-	URI        string `json:"uri"`
-	Path       string `json:"path"`
-	RequestID  string `json:"requestId"`
-	Latency    string `json:"latency"`
-	StackTrace string `json:"stackTrace"`
-}
-
 func logRequest(ctx echo.Context) {
 	req := ctx.Request()
 	var body string
 	b, err := ioutil.ReadAll(req.Body)
 	if err != nil {
-		log.Error(errors.Wrap(err, "reading from request body failed"))
+		logger.Error(errors.Wrap(err, "reading from request body failed"))
 	} else {
 		body = string(b)
 	}
@@ -73,8 +48,7 @@ func logRequest(ctx echo.Context) {
 		req.Body.Close()
 		req.Body = ioutil.NopCloser(bytes.NewBuffer(b))
 	}()
-
-	log.WithField("details", requestLogEntry{
+	logger.InfoDetailed(requestLogEntry{
 		Method:        req.Method,
 		URI:           req.RequestURI,
 		Path:          req.URL.Path,
@@ -86,13 +60,13 @@ func logRequest(ctx echo.Context) {
 		RequestID:     req.Header.Get(echo.HeaderXRequestID),
 		Body:          body,
 		ContentLength: req.ContentLength,
-	}).Info("-- Start request")
+	}, "-- Start request")
 }
 
 func logResponse(ctx echo.Context, err error, latency time.Duration) {
 	req := ctx.Request()
 	res := ctx.Response()
-	log.WithField("details", responseLogEntry{
+	logger.InfoDetailed(responseLogEntry{
 		Method:     req.Method,
 		URI:        req.RequestURI,
 		Path:       req.URL.Path,
@@ -101,7 +75,7 @@ func logResponse(ctx echo.Context, err error, latency time.Duration) {
 		RequestID:  res.Header().Get(echo.HeaderXRequestID),
 		StackTrace: getStackTrace(err),
 		Latency:    latency.String(),
-	}).Info("-- End request")
+	}, "-- End request")
 }
 
 func getErrorText(err error) string {

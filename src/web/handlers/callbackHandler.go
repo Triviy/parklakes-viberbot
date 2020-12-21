@@ -7,9 +7,9 @@ import (
 	"github.com/labstack/echo"
 	"github.com/patrickmn/go-cache"
 	"github.com/pkg/errors"
-	log "github.com/sirupsen/logrus"
 	"github.com/triviy/parklakes-viberbot/application/commands"
 	"github.com/triviy/parklakes-viberbot/application/integrations/viber"
+	"github.com/triviy/parklakes-viberbot/infrastructure/logger"
 )
 
 // CallbackHandler handles set webhook request
@@ -50,7 +50,7 @@ func (h CallbackHandler) Handle(c echo.Context) error {
 
 	messageID := fmt.Sprint(r.MessageToken)
 	if _, ok := h.inMemoryCache.Get(messageID); ok {
-		log.Infof("Message with token %s was already processed", messageID)
+		logger.Infof("Message with token %s was already processed", messageID)
 		return c.JSON(http.StatusOK, createOkResponse())
 	}
 
@@ -84,7 +84,7 @@ func (h CallbackHandler) handleCallback(r viber.Callback) (res interface{}, err 
 			sendErr = h.getCarOwnerByTextCmd.Execute(r.Message, r.Sender.ID)
 		}
 		if updateErr := h.updateSubscriberCmd.Execute(r.Sender, r.Message.Contact); updateErr != nil {
-			log.Error(updateErr)
+			logger.Error(updateErr)
 		}
 		if sendErr != nil {
 			return res, sendErr

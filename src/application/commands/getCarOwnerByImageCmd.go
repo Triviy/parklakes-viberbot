@@ -4,11 +4,11 @@ import (
 	"fmt"
 
 	"github.com/pkg/errors"
-	log "github.com/sirupsen/logrus"
 	computervision "github.com/triviy/parklakes-viberbot/application/integrations/computer-vision"
 	"github.com/triviy/parklakes-viberbot/application/integrations/viber"
 	"github.com/triviy/parklakes-viberbot/domain/interfaces"
 	"github.com/triviy/parklakes-viberbot/domain/models"
+	"github.com/triviy/parklakes-viberbot/infrastructure/logger"
 	"github.com/triviy/parklakes-viberbot/web/config"
 	"go.mongodb.org/mongo-driver/mongo"
 )
@@ -38,12 +38,12 @@ func (cmd GetCarOwnerByImageCmd) Execute(cm *viber.CallbackMessage, userID strin
 
 	r, err := cmd.imageTextReader.BatchReadFileRemoteImage(cm.Media)
 	if err != nil {
-		log.Error(err)
+		logger.Error(err)
 		text = imageCmdErrorText
 	} else {
 		text, err = cmd.getUserResponse(r)
 		if err != nil {
-			log.Error(err)
+			logger.Error(err)
 			text = imageCmdErrorText
 		}
 	}

@@ -6,7 +6,7 @@ import (
 	"net/http"
 
 	"github.com/pkg/errors"
-	log "github.com/sirupsen/logrus"
+	"github.com/triviy/parklakes-viberbot/infrastructure/logger"
 )
 
 // Header that passed to HTTP request
@@ -21,7 +21,7 @@ func SendPostRequest(url string, request interface{}, response interface{}, head
 	if err != nil {
 		return errors.Wrap(err, "serialization of request failed")
 	}
-	log.WithField("details", string(b)).Infof("---- Sending HTTP Request to %s", url)
+	logger.InfofDetailed(string(b), "---- Sending HTTP Request to %s", url)
 
 	c := &http.Client{}
 	r, err := http.NewRequest(http.MethodPost, url, bytes.NewBuffer(b))
@@ -42,6 +42,6 @@ func SendPostRequest(url string, request interface{}, response interface{}, head
 	if err != nil {
 		return errors.Wrap(err, "deserialization of response failed")
 	}
-	log.WithField("details", response).Infof("---- Receiving HTTP response from %s", url)
+	logger.InfofDetailed(response, "---- Receiving HTTP response from %s", url)
 	return nil
 }

@@ -4,13 +4,12 @@ import (
 	"strings"
 	"time"
 
-	log "github.com/sirupsen/logrus"
-
 	"github.com/pkg/errors"
 	"github.com/triviy/parklakes-viberbot/application/integrations/google"
 	"github.com/triviy/parklakes-viberbot/domain/interfaces"
 	"github.com/triviy/parklakes-viberbot/domain/models"
 	"github.com/triviy/parklakes-viberbot/domain/services"
+	"github.com/triviy/parklakes-viberbot/infrastructure/logger"
 )
 
 const (
@@ -53,12 +52,12 @@ func (cmd MigrateCarOwnersCmd) Execute() error {
 	if err != nil {
 		return err
 	}
-	log.Printf("Got %v records:\n", len(data))
+	logger.Infof("Got %v records:\n", len(data))
 	cos, err := prepareCarOwnersForSave(lastMigrationTime, data)
 	if err != nil {
 		return err
 	}
-	log.Printf("Got %v new car owners\n", len(cos))
+	logger.Infof("Got %v new car owners\n", len(cos))
 
 	if err := cmd.runDBMigration(cos); err != nil {
 		return err
@@ -67,7 +66,7 @@ func (cmd MigrateCarOwnersCmd) Execute() error {
 	if err := cmd.setLastMigration(migrationTime); err != nil {
 		return err
 	}
-	log.Printf("Last migration time is set to %s\n", migrationTime)
+	logger.Infof("Last migration time is set to %s\n", migrationTime)
 	return nil
 }
 
@@ -80,7 +79,7 @@ func prepareCarOwnersForSave(lastMigrationTime time.Time, data [][]interface{}) 
 		}
 		created, err := services.ToKyivTime(co.Created)
 		if err != nil {
-			log.Printf("Failed to convert created time of %s to Kyiv time: %v\n", co.ID, err)
+			logger.Infof("Failed to convert created time of %s to Kyiv time: %v\n", co.ID, err)
 		}
 		if created.After(lastMigrationTime) {
 			cos[co.ID] = *co
@@ -121,7 +120,7 @@ func (cmd MigrateCarOwnersCmd) runDBMigration(cos map[string]models.CarOwner) er
 		if err := cmd.carOwnersRepo.Upsert(co.ID, co); err != nil {
 			return errors.Wrapf(err, "Upsert failed for %s", co.ID)
 		}
-		log.Printf("%v migrated\n", co.ID)
+		logger.Infof("%v migrated\n", co.ID)
 	}
 	return nil
 }
