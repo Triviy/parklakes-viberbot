@@ -3,6 +3,7 @@ package handlers
 import (
 	"fmt"
 	"net/http"
+	"time"
 
 	"github.com/labstack/echo"
 	"github.com/patrickmn/go-cache"
@@ -49,9 +50,22 @@ func (h CallbackHandler) Handle(c echo.Context) error {
 	}
 
 	messageID := fmt.Sprint(r.MessageToken)
-	if _, ok := h.inMemoryCache.Get(messageID); ok {
+	if processed := h.lockCallback(messageID); processed {
 		log.Infof("Message with token %s was already processed", messageID)
 		return c.JSON(http.StatusOK, createOkResponse())
+	}
+
+	for i := 0; i < 5; i++ {
+		if v, ok := h.inMemoryCache.Get(messageID); ok {
+			if v.(bool) {
+				log.Infof("Message with token %s was already processed", messageID)
+				return c.JSON(http.StatusOK, createOkResponse())
+			}
+			time.Sleep(time.Second)
+		} else {
+			h.inMemoryCache.SetDefault(messageID, false)
+			break
+		}
 	}
 
 	res, err := h.handleCallback(r)
@@ -59,8 +73,27 @@ func (h CallbackHandler) Handle(c echo.Context) error {
 		return err
 	}
 
-	h.inMemoryCache.SetDefault(messageID, true)
+	h.unlockCallback(messageID)
 	return c.JSON(http.StatusOK, res)
+}
+
+func (h CallbackHandler) lockCallback(messageID string) (processed bool) {
+	for i := 0; i < 5; i++ {
+		if v, ok := h.inMemoryCache.Get(messageID); ok {
+			if v.(bool) {
+				return true
+			}
+			time.Sleep(time.Second)
+		} else {
+			h.inMemoryCache.SetDefault(messageID, false)
+			return false
+		}
+	}
+	return false
+}
+
+func (h CallbackHandler) unlockCallback(messageID string) {
+	h.inMemoryCache.SetDefault(messageID, true)
 }
 
 func (h CallbackHandler) handleCallback(r viber.Callback) (res interface{}, err error) {
