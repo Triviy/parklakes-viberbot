@@ -51,7 +51,7 @@ func (h CallbackHandler) Handle(c echo.Context) error {
 
 	messageID := fmt.Sprint(r.MessageToken)
 	if processed := h.lockCallback(messageID); processed {
-		log.Infof("Message with token %s was already processed", messageID)
+		log.Infof("%s event with token %s was already processed", r.Event, messageID)
 		return c.JSON(http.StatusOK, createOkResponse())
 	}
 
