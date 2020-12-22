@@ -102,8 +102,8 @@ func (hook *AppInsightsHook) fire(entry *logrus.Entry) error {
 
 func (hook *AppInsightsHook) buildTrace(entry *logrus.Entry) (*appinsights.TraceTelemetry, error) {
 	// Add the message as a field if it isn't already
-	if _, ok := entry.Data["message"]; !ok {
-		entry.Data["message"] = entry.Message
+	if _, ok := entry.Data["msg"]; !ok {
+		entry.Data["msg"] = entry.Message
 	}
 
 	level := levelMap[entry.Level]
