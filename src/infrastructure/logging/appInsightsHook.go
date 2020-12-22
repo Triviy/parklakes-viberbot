@@ -101,31 +101,33 @@ func (hook *AppInsightsHook) fire(entry *logrus.Entry) error {
 }
 
 func (hook *AppInsightsHook) buildTrace(entry *logrus.Entry) (*appinsights.TraceTelemetry, error) {
-	// Add the message as a field if it isn't already
-	if _, ok := entry.Data["msg"]; !ok {
-		entry.Data["msg"] = entry.Message
-	}
-
 	level := levelMap[entry.Level]
 	trace := appinsights.NewTraceTelemetry(entry.Message, level)
 	if trace == nil {
 		return nil, fmt.Errorf("Could not create telemetry trace with entry %+v", entry)
 	}
 	for k, v := range entry.Data {
-		if _, ok := hook.ignoreFields[k]; ok {
-			continue
-		}
-		if fn, ok := hook.filters[k]; ok {
-			v = fn(v) // apply custom filter
-		} else {
-			v = formatData(v) // use default formatter
-		}
-		vStr := fmt.Sprintf("%v", v)
-		trace.Properties[k] = vStr
+		hook.addFormatedTraceProp(trace.Properties, k, v)
+	}
+	if _, ok := entry.Data["message"]; !ok {
+		hook.addFormatedTraceProp(trace.Properties, "message", entry.Message)
 	}
 	trace.Properties["source_level"] = entry.Level.String()
 	trace.Timestamp = entry.Time
 	return trace, nil
+}
+
+func (hook *AppInsightsHook) addFormatedTraceProp(props map[string]string, k string, v interface{}) {
+	if _, ok := hook.ignoreFields[k]; ok {
+		return
+	}
+	if fn, ok := hook.filters[k]; ok {
+		v = fn(v) // apply custom filter
+	} else {
+		v = formatData(v) // use default formatter
+	}
+	vStr := fmt.Sprintf("%v", v)
+	props[k] = vStr
 }
 
 // formatData returns value as a suitable format.
