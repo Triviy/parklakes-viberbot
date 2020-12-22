@@ -55,19 +55,6 @@ func (h CallbackHandler) Handle(c echo.Context) error {
 		return c.JSON(http.StatusOK, createOkResponse())
 	}
 
-	for i := 0; i < 5; i++ {
-		if v, ok := h.inMemoryCache.Get(messageID); ok {
-			if v.(bool) {
-				log.Infof("Message with token %s was already processed", messageID)
-				return c.JSON(http.StatusOK, createOkResponse())
-			}
-			time.Sleep(time.Second)
-		} else {
-			h.inMemoryCache.SetDefault(messageID, false)
-			break
-		}
-	}
-
 	res, err := h.handleCallback(r)
 	if err != nil {
 		return err
