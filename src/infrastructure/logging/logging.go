@@ -1,6 +1,7 @@
 package logging
 
 import (
+	"fmt"
 	"os"
 	"time"
 
@@ -9,15 +10,17 @@ import (
 )
 
 // InitLog initializes logging
-func InitLog(instrumentationKey string) {
+func InitLog(instrumentationKey string, enableTracingDiag bool) {
 	logrus.SetFormatter(&logrus.TextFormatter{
 		TimestampFormat: time.RFC3339Nano,
 	})
 	logrus.SetOutput(os.Stdout)
-	hook := NewAppInsightsHook("parklakes-viberbot", &appinsights.TelemetryConfiguration{
-		InstrumentationKey: instrumentationKey,
-		MaxBatchSize:       8192,
-		MaxBatchInterval:   2 * time.Second,
-	})
+	hook := NewAppInsightsHook("parklakes-viberbot", instrumentationKey)
 	logrus.AddHook(hook)
+	if enableTracingDiag {
+		appinsights.NewDiagnosticsMessageListener(func(msg string) error {
+			fmt.Printf("[%s] %s\n", time.Now().Format(time.UnixDate), msg)
+			return nil
+		})
+	}
 }

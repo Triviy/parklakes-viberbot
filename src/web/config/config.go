@@ -27,7 +27,8 @@ type apiConfig struct {
 		APIUrl string `yaml:"apiURL" env:"COMPUTER_VISION_API_URL" env-required:"true"`
 	} `yaml:"computerVision"`
 	AppInsights struct {
-		InstrumentationKey string `yaml:"instrumentationKey" env:"APPINSIGHTS_INSTRUMENTATION_KEY" env-required:"true"`
+		InstrumentationKey       string `yaml:"instrumentationKey" env:"APPINSIGHTS_INSTRUMENTATION_KEY" env-required:"true"`
+		EnableTracingDiagnostics bool   `yaml:"enableTracingDiagnostics" env:"APPINSIGHTS_ENABLE_TRACING_DIAGNOSTICS" env-default:"false"`
 	} `yaml:"appInsights"`
 }
 
@@ -111,4 +112,9 @@ func (c APIConfig) GetComputerVisionAPIUrl() string {
 // GetAppInsightsInstrumentationKey returns InstrumentationKey for AppInsights
 func (c APIConfig) GetAppInsightsInstrumentationKey() string {
 	return c.cfg.AppInsights.InstrumentationKey
+}
+
+// GetAppInsightsEnableTracingDiag returns if tracing for AppInsights telemetry should be enabled
+func (c APIConfig) GetAppInsightsEnableTracingDiag() bool {
+	return c.cfg.AppInsights.EnableTracingDiagnostics
 }

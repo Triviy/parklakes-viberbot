@@ -3,6 +3,7 @@ package logging
 import (
 	"encoding/json"
 	"fmt"
+	"time"
 
 	"github.com/microsoft/ApplicationInsights-Go/appinsights"
 	"github.com/microsoft/ApplicationInsights-Go/appinsights/contracts"
@@ -36,8 +37,13 @@ type AppInsightsHook struct {
 }
 
 // NewAppInsightsHook returns an initialised logrus hook for Application Insights
-func NewAppInsightsHook(name string, conf *appinsights.TelemetryConfiguration) *AppInsightsHook {
-	c := appinsights.NewTelemetryClientFromConfig(conf)
+func NewAppInsightsHook(name string, instrumentationKey string) *AppInsightsHook {
+	tc := appinsights.NewTelemetryConfiguration(instrumentationKey)
+	tc.MaxBatchSize = 8192
+	tc.MaxBatchInterval = 2 * time.Second
+
+	c := appinsights.NewTelemetryClientFromConfig(tc)
+
 	if name != "" {
 		c.Context().Tags.Cloud().SetRole(name)
 	}

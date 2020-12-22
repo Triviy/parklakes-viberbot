@@ -25,7 +25,7 @@ func init() {
 		log.Fatal(err)
 		return
 	}
-	logging.InitLog(c.GetAppInsightsInstrumentationKey())
+	logging.InitLog(c.GetAppInsightsInstrumentationKey(), c.GetAppInsightsEnableTracingDiag())
 	cfg = c
 }
 
