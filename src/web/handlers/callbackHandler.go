@@ -78,13 +78,18 @@ func (h CallbackHandler) Handle(c echo.Context) error {
 }
 
 func (h CallbackHandler) lockCallback(messageID string) (processed bool) {
+	log.Info(")))) start")
 	for i := 0; i < 5; i++ {
 		if v, ok := h.inMemoryCache.Get(messageID); ok {
+			log.Info(")))) ok is true")
 			if v.(bool) {
+				log.Info(")))) v is true")
 				return true
 			}
+			log.Info(")))) v is false, sleeping")
 			time.Sleep(time.Second)
 		} else {
+			log.Info(")))) ok is false")
 			h.inMemoryCache.SetDefault(messageID, false)
 			return false
 		}
