@@ -35,16 +35,19 @@ func (cmd GetCarOwnerByImageCmd) Execute(cm *viber.CallbackMessage, userID strin
 		return errors.New("viber.CallbackMessage is nil")
 	}
 	var text string
-
-	r, err := cmd.imageTextReader.BatchReadFileRemoteImage(cm.Media)
-	if err != nil {
-		log.Error(err)
-		text = imageCmdErrorText
+	if cm.Media == "" {
+		text = "Вибачте, наразі я не підтримую такий спосіб відправки зображення, але ви можете просто скопiювати i вставити його в цей чат. Це точно має спрацювати 👍"
 	} else {
-		text, err = cmd.getUserResponse(r)
+		r, err := cmd.imageTextReader.BatchReadFileRemoteImage(cm.Media)
 		if err != nil {
 			log.Error(err)
 			text = imageCmdErrorText
+		} else {
+			text, err = cmd.getUserResponse(r)
+			if err != nil {
+				log.Error(err)
+				text = imageCmdErrorText
+			}
 		}
 	}
 
