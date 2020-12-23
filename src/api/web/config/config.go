@@ -27,7 +27,7 @@ type apiConfig struct {
 		APIUrl string `yaml:"apiURL" env:"COMPUTER_VISION_API_URL" env-required:"true"`
 	} `yaml:"computerVision"`
 	AppInsights struct {
-		InstrumentationKey       string `yaml:"instrumentationKey" env:"APPINSIGHTS_INSTRUMENTATION_KEY" env-required:"true"`
+		InstrumentationKey       string `yaml:"instrumentationKey" env:"APPINSIGHTS_INSTRUMENTATIONKEY" env-required:"true"`
 		EnableTracingDiagnostics bool   `yaml:"enableTracingDiagnostics" env:"APPINSIGHTS_ENABLE_TRACING_DIAGNOSTICS" env-default:"false"`
 	} `yaml:"appInsights"`
 }
