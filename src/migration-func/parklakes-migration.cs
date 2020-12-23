@@ -9,9 +9,9 @@ namespace Parklakes.Migration
     public static class parklakes_migration
     {
         private static HttpClient _client = new HttpClient();
-//"0 0 1 * * *")
+
         [FunctionName("parklakes_migration")]
-        public static async Task Run([TimerTrigger("0 */1 * * * *")]TimerInfo myTimer, ILogger log)
+        public static async Task Run([TimerTrigger("0 0 1 * * *")]TimerInfo myTimer, ILogger log)
         {
             log.LogInformation("starting car owners migration job");
             var apiKey = Environment.GetEnvironmentVariable("API_KEY");
