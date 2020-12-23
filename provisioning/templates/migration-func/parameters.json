@@ -1,0 +1,15 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "sites_fn_parklakes_migration_name": {
+            "value": null
+        },
+        "storageAccounts_safnparklakesmigration_name": {
+            "value": null
+        },
+        "serverfarms_ASP_rgparklakesautomationwin_98ec_name": {
+            "value": null
+        }
+    }
+}

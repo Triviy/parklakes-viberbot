@@ -1,0 +1,30 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "sites_app_parklakes_viberbot_name": {
+            "value": null
+        },
+        "components_ai_parklakes_automation_name": {
+            "value": null
+        },
+        "serverfarms_ASP_rgparklakesautomation_8fd8_name": {
+            "value": null
+        },
+        "accounts_cv_parklakes_viberbot_name": {
+            "value": null
+        },
+        "actionGroups_ag_me_parklakes_automation_name": {
+            "value": null
+        },
+        "databaseAccounts_cosmos_parklakes_viberbot_name": {
+            "value": null
+        },
+        "smartdetectoralertrules_failure_anomalies___ai_parklakes_automation_name": {
+            "value": null
+        },
+        "actiongroups_application_insights_smart_detection_externalid": {
+            "value": null
+        }
+    }
+}
