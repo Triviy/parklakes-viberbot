@@ -49,6 +49,7 @@ func main() {
 	e.POST("/api/v1/car-owners/migrate", h.MigrateCarOwnersHandler.Handle, apiKeyAuth)
 	e.POST("/api/v1/viber/set-webhook", h.SetWebhookHandler.Handle, apiKeyAuth)
 	e.POST("/api/v1/viber/callback", h.CallbackHandler.Handle, middlewares.ViberHashCheck(cfg.GetViberAPIKey()))
+	e.File("/", fmt.Sprintf("%s/index.html", cfg.GetAssetsPath()))
 
 	port := fmt.Sprintf(":%s", cfg.GetAppPort())
 	web.GracefulShutdown(e, e.Start(port))

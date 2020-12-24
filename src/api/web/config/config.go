@@ -11,6 +11,7 @@ type apiConfig struct {
 	AppPort    string `yaml:"appPort" env:"PORT" env-default:"8081"`
 	AppBaseURL string `yaml:"appBaseURL" env:"WEBSITE_HOSTNAME" env-default:"http://localhost"`
 	APIKey     string `yaml:"apiKey" env:"API_KEY" env-required:"true"`
+	AssetsPath string `yaml:"assetsPath" env:"ASSETS_PATH" env-default:"assets"`
 	Database   struct {
 		ConnectionString string `yaml:"connectionString" env:"DB_CONNECTION_STRING" env-required:"true"`
 	} `yaml:"database"`
@@ -72,6 +73,11 @@ func (c APIConfig) GetAPIKey() string {
 // GetAppBaseURL returns application base URL
 func (c APIConfig) GetAppBaseURL() string {
 	return c.cfg.AppBaseURL
+}
+
+// GetAssetsPath returns path to assets
+func (c APIConfig) GetAssetsPath() string {
+	return c.cfg.AssetsPath
 }
 
 // GetDBConnectionString returns database connection string from configuration

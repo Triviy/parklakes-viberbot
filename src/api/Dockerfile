@@ -10,4 +10,5 @@ RUN CGO_ENABLED=0 GOOS=linux go build -ldflags="-w -s" -a -installsuffix cgo -o 
 
 FROM gcr.io/distroless/base
 COPY --from=builder /go/bin/parklakes-viberbot /app/parklakes-viberbot
+COPY --from=builder /go/src/app/assets/index.html /app/assets/index.html
 ENTRYPOINT ["/app/parklakes-viberbot"]
