@@ -27,7 +27,7 @@ var replacer = strings.NewReplacer(
 	"О", "O",
 	"Р", "P",
 	"Т", "T",
-	"И", "U",
+	"И", "I",
 	"Х", "X",
 	"У", "Y",
 	" ", "",
@@ -36,7 +36,7 @@ var replacer = strings.NewReplacer(
 	"\n", "",
 )
 var standardNumberRegexp = regexp.MustCompile(`[A-Z]{2}[0-9]{4}[A-Z]{2}|[0-9]{5}[A-Z,А-Я,І]{2}`)
-var euroNumberRegexp = regexp.MustCompile(`[A-Z]{3}[0-9]{3}`)
+var euroNumberRegexp = regexp.MustCompile(`^[A-Z]{3}[0-9]{3}$`)
 
 // ToCarNumber returns searchable car number string
 func ToCarNumber(cn string) (string, bool) {
